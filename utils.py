@@ -46,7 +46,7 @@ def get_save_filename(suggested_filename=''):
 
 def get_most_possible_file():
     retval = ''
-    types = ('*.xslx', '*.csv')
+    types = ('*.xlsx', '*.csv')
     files_grabbed = []
     for files in types:
         files_grabbed.extend(glob.glob(files))

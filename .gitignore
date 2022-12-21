@@ -130,7 +130,7 @@ dmypy.json
 
 # Any data files
 *.csv
-*.xls*
+*.xlsx
 
 # makeExe
 *.exe
