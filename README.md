@@ -13,8 +13,8 @@ Simply run enterprise_bookmarks_manager.exe. If no further argument has been pro
 
 ### Interactive mode:
 Just run the app to use the interactive mode
-> enterprise_bookmarks_manager.exe
+```enterprise_bookmarks_manager.exe```
 
 ### CLI mode
 Or open a command line and call the app with an argument
-> enterprise_bookmarks_manager.exe Bookmarks_from_Admin_Center.csv
+```enterprise_bookmarks_manager.exe Bookmarks_from_Admin_Center.csv```
