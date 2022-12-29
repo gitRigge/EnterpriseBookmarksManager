@@ -23,38 +23,55 @@ REM THE SOFTWARE.
 REM
 REM ---------------------------------------------------------------------------
 TITLE Build Executable
-setlocal enabledelayedexpansion
-echo Set Python Path Variables
+setlocal EnableDelayedExpansion 
+echo [1mSet Python Path Variables[0m
 set PATH=c:\Python310\;c:\Python310\Lib\site-packages\;c:\Python310\Scripts\;%PATH%
 set PYTHONPATH=c:\Python310\Lib\
 set PYTHONHOME=c:\Python310\
-echo Install Requirements
+echo [1mInstall Requirements[0m
 pip install -r requirements.txt
-echo Run Tests
+echo [1mRun Tests[0m
 coverage run -m pytest .\tests
 if %ERRORLEVEL% == 0 (
+    echo [1mPrint Coverage Report[0m
     coverage report -m
-    echo Build Executable
-    IF EXIST release\enterprise_bookmarks_manager.zip DEL /F release\enterprise_bookmarks_manager.zip
-    pyinstaller ^
-        --onefile ^
-        --distpath bin ^
-        --clean ^
-        --log-level INFO ^
-        --name enterprise_bookmarks_manager ^
-        --distpath release ^
-        --hidden-import openpyxl ^
-        --hidden-import xls2bm ^
-        --hidden-import bm2xls ^
-        --hidden-import enums ^
-        --hidden-import utils ^
-        enterprise_bookmarks_manager.py
-    powershell Compress-Archive release\enterprise_bookmarks_manager.exe release\enterprise_bookmarks_manager.zip
-    del release\enterprise_bookmarks_manager.exe
-    del /F /Q enterprise_bookmarks_manager.spec
-    rmdir /Q /S __pycache__
-    rmdir /Q /S build
+    echo [1mFlake8 Lintering[0m
+    set MYPYFILES=
+    cd tests
+    for /F %%i in ('dir /b *.py') do (
+        set MYPYFILES=!MYPYFILES!tests/%%i 
+    )
+    cd ..
+    for /F %%i in ('dir /b *.py') do (
+        set MYPYFILES=!MYPYFILES!%%i 
+    )
+    flake8 --count --statistics --verbose --benchmark !MYPYFILES!
+    if %ERRORLEVEL% == 0 (
+        echo [1mNo Linting Errors with Flake8[0m
+        echo [1mBuild Executable[0m
+        IF EXIST release\enterprise_bookmarks_manager.zip DEL /F release\enterprise_bookmarks_manager.zip
+        pyinstaller ^
+            --onefile ^
+            --distpath bin ^
+            --clean ^
+            --log-level INFO ^
+            --name enterprise_bookmarks_manager ^
+            --distpath release ^
+            --hidden-import openpyxl ^
+            --hidden-import xls2bm ^
+            --hidden-import bm2xls ^
+            --hidden-import enums ^
+            --hidden-import utils ^
+            enterprise_bookmarks_manager.py
+        powershell Compress-Archive release\enterprise_bookmarks_manager.exe release\enterprise_bookmarks_manager.zip
+        del release\enterprise_bookmarks_manager.exe
+        del /F /Q enterprise_bookmarks_manager.spec
+        rmdir /Q /S __pycache__
+        rmdir /Q /S build
+    ) else (
+        echo [1mThere were Errors while code style checking with Flake8 - Abort[0m
+    )
 ) else (
-    echo There were Errors in Tests - Abort
+    echo [1mThere were Errors in Tests - Abort[0m
 )
 pause
