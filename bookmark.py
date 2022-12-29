@@ -2,19 +2,19 @@
 # -*- coding: utf-8 -*-
 
 # The MIT License (MIT)
-# 
+#
 # Copyright (c) 2023, Roland Rickborn (r_2@gmx.net)
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -31,134 +31,185 @@ import datetime
 import json
 import pytz
 
+
 class Bookmark(object):
-    
+
     def __init__(self, title: str, url: str, keywords: str, **kwargs):
+
+        # Class variables with default values
+        self.title = ''
+        self.url = ''
+        self.keywords = []
+        self.match_similar_keywords = True
+        self.state = None
+        self.description = None
+        self.reserved_keywords = None
+        self.categories = None
+        self.start_date = None
+        self.end_date = None
+        self.country_region = None
+        self.use_aad_location = False
+        self.groups = None
+        self.device_and_os = None
+        self.targeted_variations = None
+        self.last_modified = None
+        self.last_modified_by = None
+        self.id = None
+
         if self.validate_title(title):
             self.title = title
         else:
             self.title = '{}...'.format(title[:57])
             print('Title has been shortened to \'{}\''.format(self.title))
-        
+
         if self.validate_url(url):
             self.url = url
         else:
-            raise ValidationError('URL of \'{}\' could not be validated'.format(self.title))
-        
-        if self.validate_keywords(self.remove_duplicates(self.get_serialized_values(keywords))):
-            self.keywords = self.remove_duplicates(self.get_serialized_values(keywords))
+            raise ValidationError(
+                'URL of \'{}\' could not be validated'.format(self.title))
+
+        if self.validate_keywords(
+                self.remove_duplicates(self.get_serialized_values(keywords))):
+            self.keywords = self.remove_duplicates(
+                self.get_serialized_values(keywords))
         else:
-            raise ValidationError('Keywords of \'{}\' could not be validated'.format(self.title))
-        
-        self.match_similar_keywords = True
+            raise ValidationError(
+                'Keywords of \'{}\' could not be validated'.format(self.title))
+
         if 'match_similar_keywords' in kwargs:
             if kwargs['match_similar_keywords'] is not None:
-                if self.validate_match_sim_kw(kwargs['match_similar_keywords']):
-                    self.match_similar_keywords = self.get_boolean(kwargs['match_similar_keywords'])
+                if self.valid_match_sim_kw(kwargs['match_similar_keywords']):
+                    self.match_similar_keywords = self.get_boolean(
+                        kwargs['match_similar_keywords'])
                 else:
-                    raise ValidationError('Match similar keywords value of \'{}\' could not be validated'.format(self.title))
+                    raise ValidationError(
+                        'Match similar keywords value of \'{}\' '
+                        'could not be validated'.format(self.title))
 
-        self.state = None        
         if 'state' in kwargs:
             if self.validate_state(kwargs['state']):
                 self.state = kwargs['state']
             else:
-                raise ValidationError('State of \'{}\' could not be validated'.format(self.title))
+                raise ValidationError(
+                    'State of \'{}\' could not be validated'.format(
+                        self.title))
 
-        self.description = None
         if 'description' in kwargs:
             if kwargs['description'] is not None:
                 if self.validate_description(kwargs['description']):
                     self.description = kwargs['description']
                 else:
-                    self.description = '{}...'.format(kwargs['description'][:297])
-                    print('Description has been shortened to \'{}\''.format(self.description))
-        
-        self.reserved_keywords = None
+                    self.description = '{}...'.format(
+                        kwargs['description'][:297])
+                    print('Description has been shortened to \'{}\''.format(
+                        self.description))
+
         if 'reserved_keywords' in kwargs:
             self.reserved_keywords = self.remove_duplicates(
                 self.get_serialized_values(kwargs['reserved_keywords']))
 
-        self.categories = None
         if 'categories' in kwargs:
-            self.categories = self.remove_duplicates(self.get_serialized_values(kwargs['categories']))
-        
-        self.start_date = None
+            self.categories = self.remove_duplicates(
+                self.get_serialized_values(kwargs['categories']))
+
         if 'start_date' in kwargs:
             if self.validate_date(kwargs['start_date']):
                 self.start_date = kwargs['start_date']
             else:
-                raise ValidationError('Start Date of \'{}\' could not be validated'.format(self.title))
-        
-        self.end_date = None
+                raise ValidationError(
+                    'Start Date of \'{}\' could not be validated'.format(
+                        self.title))
+
         if 'end_date' in kwargs:
             if self.validate_date(kwargs['end_date']):
                 self.end_date = kwargs['end_date']
             else:
-                raise ValidationError('End Date of \'{}\' could not be validated'.format(self.title))
-        
-        self.country_region = None
+                raise ValidationError(
+                    'End Date of \'{}\' could not be validated'.format(
+                        self.title))
+
         if 'country_region' in kwargs:
-            if self.validate_country_region(self.get_serialized_values(kwargs['country_region'])):
-                self.country_region = self.get_serialized_values(kwargs['country_region'])
+            if self.validate_country_region(
+                    self.get_serialized_values(kwargs['country_region'])):
+                self.country_region = self.get_serialized_values(
+                    kwargs['country_region'])
             else:
-                raise ValidationError('Country/Region of \'{}\' could not be validated'.format(self.title))
-        
-        self.use_aad_location = False
+                raise ValidationError(
+                    'Country/Region of \'{}\' could not be validated'.format(
+                        self.title))
+
         if 'use_aad_location' in kwargs:
             if kwargs['use_aad_location'] is not None:
                 if self.validate_use_aad_location(kwargs['use_aad_location']):
-                    self.use_aad_location = self.get_boolean(kwargs['use_aad_location'])
+                    self.use_aad_location = self.get_boolean(
+                        kwargs['use_aad_location'])
                 else:
-                    raise ValidationError('Use Azure-AD Location of \'{}\' could not be validated'.format(self.title))
-        
-        self.groups = None
+                    raise ValidationError(
+                        'Use AAD Location of \'{}\' '
+                        'could not be validated'.format(self.title))
+
         if 'groups' in kwargs:
-            if self.validate_groups(self.get_serialized_values(kwargs['groups'])):
+            if self.validate_groups(self.get_serialized_values(
+                    kwargs['groups'])):
                 self.groups = self.get_serialized_values(kwargs['groups'])
             else:
-                raise ValidationError('Groups of \'{}\' could not be validated'.format(self.title))
+                raise ValidationError(
+                    'Groups of \'{}\' could not be validated'.format(
+                        self.title))
 
-        self.device_and_os = None
         if 'device_and_os' in kwargs:
-            if self.validate_device_and_os(self.get_serialized_values(kwargs['device_and_os'])):
-                self.device_and_os = self.get_serialized_values(kwargs['device_and_os'])
+            if self.validate_device_and_os(self.get_serialized_values(
+                    kwargs['device_and_os'])):
+                self.device_and_os = self.get_serialized_values(
+                    kwargs['device_and_os'])
             else:
-                raise ValidationError('Device/OS of \'{}\' could not be validated'.format(self.title))
-        
-        self.targeted_variations = None
+                raise ValidationError(
+                    'Device/OS of \'{}\' could not be validated'.format(
+                        self.title))
+
         if 'targeted_variations' in kwargs:
-            if self.validate_targeted_variations(kwargs['targeted_variations']):
-                self.targeted_variations = self.get_serialized_variations(kwargs['targeted_variations'])
+            if self.validate_targeted_variations(
+                    kwargs['targeted_variations']):
+                self.targeted_variations = self.get_serialized_variations(
+                    kwargs['targeted_variations'])
             else:
-                raise ValidationError('Variations of \'{}\' could not be validated'.format(self.title))
-        
-        self.last_modified = None
+                raise ValidationError(
+                    'Variations of \'{}\' could not be validated'.format(
+                        self.title))
+
         if 'last_modified' in kwargs:
             if self.validate_date(kwargs['last_modified']):
                 self.last_modified = kwargs['last_modified']
             else:
-                raise ValidationError('Last Modified Date of \'{}\' could not be validated'.format(self.title))
-        
-        self.last_modified_by = None
+                raise ValidationError(
+                    'Last Modified Date of \'{}\' could '
+                    'not be validated'.format(self.title))
+
         if 'last_modified_by' in kwargs:
             self.last_modified_by = kwargs['last_modified_by']
-        
-        self.id = None
+
         if 'id' in kwargs:
             if self.validate_id(kwargs['id']):
                 self.id = kwargs['id']
             else:
-                raise ValidationError('ID of \'{}\' could not be validated'.format(self.title))
+                raise ValidationError(
+                    'ID of \'{}\' could not be validated'.format(self.title))
 
         if not self.validate_start_end_dates(self.start_date, self.end_date):
-            raise ValidationError('Start Date/End Date of \'{}\' could not be validated'.format(self.title))
-        
+            raise ValidationError(
+                'Start Date/End Date of \'{}\' could not be validated'.format(
+                    self.title))
+
         if not self.validate_state_and_dates(self.state, self.start_date):
-            raise ValidationError('State/End Date of \'{}\' could not be validated'.format(self.title))
-        
-        if not self.validate_keywords_and_reserved_keywords(self.keywords, self.reserved_keywords):
-            raise ValidationError('Keywords/Reserved Keywords of \'{}\' could not be validated'.format(self.title))
+            raise ValidationError(
+                'State/End Date of \'{}\' could '
+                'not be validated'.format(self.title))
+
+        if not self.validate_keywords_and_reserved_keywords(
+                self.keywords, self.reserved_keywords):
+            raise ValidationError(
+                'Keywords/Reserved Keywords of \'{}\' could '
+                'not be validated'.format(self.title))
 
     def to_string(self):
         if self.match_similar_keywords:
@@ -182,14 +233,14 @@ class Bookmark(object):
         else:
             try:
                 start_date = self.start_date.strftime('%Y-%m-%dT%H:%M:%S+00')
-            except:
+            except Exception:
                 start_date = self.start_date
         if self.end_date is None:
             end_date = ''
         else:
             try:
                 end_date = self.end_date.strftime('%Y-%m-%dT%H:%M:%S+00')
-            except:
+            except Exception:
                 end_date = self.end_date
         if self.country_region is None:
             country_region = ''
@@ -216,7 +267,7 @@ class Bookmark(object):
         else:
             try:
                 last_modified = self.last_modified.strftime('%m/%d/%Y')
-            except:
+            except Exception:
                 last_modified = self.last_modified
         if self.last_modified_by is None:
             last_modified_by = ''
@@ -258,13 +309,13 @@ class Bookmark(object):
     @classmethod
     def get_serialized_variations(cls, variations):
         if variations is not None:
-            return json.loads(variations.replace('""','"'))
+            return json.loads(variations.replace('""', '"'))
         else:
             return None
-    
+
     @classmethod
     def get_boolean(cls, value: str):
-        if value in ['true','True','1']:
+        if value in ['true', 'True', '1']:
             return True
         else:
             return False
@@ -281,13 +332,13 @@ class Bookmark(object):
 
     @classmethod
     def validate_title(cls, title):
-        if title != None and len(title) > 0 and len(title) < 60:
+        if title is not None and len(title) > 0 and len(title) < 60:
             return True
         return False
 
     @classmethod
     def validate_url(cls, url):
-        if url != None and validators.url(url):
+        if url is not None and validators.url(url):
             return True
         return False
 
@@ -296,9 +347,9 @@ class Bookmark(object):
         if len(keywords) != 0:
             return True
         return False
-    
+
     @classmethod
-    def validate_match_sim_kw(cls, msk: str):
+    def valid_match_sim_kw(cls, msk: str):
         if msk in ['true', 'false']:
             return True
         return False
@@ -325,7 +376,7 @@ class Bookmark(object):
     def validate_country_region(cls, country_region):
         if country_region is not None:
             for region in country_region:
-                if not region in enums.Enums().countries:
+                if region not in enums.Enums().countries:
                     return False
         return True
 
@@ -347,7 +398,7 @@ class Bookmark(object):
     def validate_device_and_os(cls, device_and_os):
         if device_and_os is not None:
             for spec in device_and_os:
-                if not spec in enums.Enums().devices:
+                if spec not in enums.Enums().devices:
                     return False
         return True
 
@@ -357,27 +408,39 @@ class Bookmark(object):
             _tv_json = json.loads(tv)
             for i in range(len(_tv_json)):
                 for key in list(_tv_json[i].keys()):
-                    if not key in enums.Enums().variations:
+                    if key not in enums.Enums().variations:
                         return False
                     if key == 'title':
                         if not cls.validate_title(_tv_json[i][key]):
-                            raise ValidationError('Variation Title \'{}\' could not be validated'.format(_tv_json[i][key]))
+                            raise ValidationError(
+                                'Variation Title \'{}\' could not be '
+                                'validated'.format(_tv_json[i][key]))
                     if key == 'url':
                         if not cls.validate_url(_tv_json[i][key]):
-                            raise ValidationError('Variation URL \'{}\' could not be validated'.format(_tv_json[i][key]))
+                            raise ValidationError(
+                                'Variation URL \'{}\' could not be '
+                                'validated'.format(_tv_json[i][key]))
                     if key == 'description':
                         if not cls.validate_description(_tv_json[i][key]):
-                            raise ValidationError('Variation Description \'{}\' could not be validated'.format(_tv_json[i][key]))
+                            raise ValidationError(
+                                'Variation Description \'{}\' could not be '
+                                'validated'.format(_tv_json[i][key]))
                     if key == 'country':
-                        if not cls.validate_country_region(cls.get_serialized_values(_tv_json[i][key])):
-                            raise ValidationError('Variation Country \'{}\' could not be validated'.format(_tv_json[i][key]))
+                        if not cls.validate_country_region(
+                                cls.get_serialized_values(_tv_json[i][key])):
+                            raise ValidationError(
+                                'Variation Country \'{}\' could not be '
+                                'validated'.format(_tv_json[i][key]))
                     if key == 'device':
-                        if not cls.validate_device_and_os(cls.get_serialized_values(_tv_json[i][key])):
-                            raise ValidationError('Variation Device \'{}\' could not be validated'.format(_tv_json[i][key]))
+                        if not cls.validate_device_and_os(
+                                cls.get_serialized_values(_tv_json[i][key])):
+                            raise ValidationError(
+                                'Variation Device \'{}\' could not be '
+                                'validated'.format(_tv_json[i][key]))
             return True
         else:
             return True
-        
+
     @classmethod
     def validate_id(cls, id):
         if id is not None:
@@ -390,7 +453,8 @@ class Bookmark(object):
         if isinstance(edate, datetime.date):
             if edate < datetime.datetime.utcnow().replace(tzinfo=pytz.UTC):
                 return False
-        if isinstance(sdate, datetime.date) and isinstance(edate, datetime.date):
+        if isinstance(sdate, datetime.date) and isinstance(
+                edate, datetime.date):
             if edate < sdate:
                 return False
         return True
@@ -434,6 +498,7 @@ class Bookmark(object):
             'Q': 'Last Modified By',
             'R': 'Id'
         }
+
 
 class ValidationError(Exception):
     pass

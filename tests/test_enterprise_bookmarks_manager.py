@@ -2,19 +2,19 @@
 # -*- coding: utf-8 -*-
 
 # The MIT License (MIT)
-# 
+#
 # Copyright (c) 2023, Roland Rickborn (r_2@gmx.net)
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -33,18 +33,20 @@ import datetime as dt
 import os
 from unittest.mock import patch
 
-import pytest
 import pytz
 
 import enterprise_bookmarks_manager as ebm
 
 TEST_START_DATE = dt.datetime.utcnow().replace(tzinfo=pytz.UTC)
-TEST_END_DATE = dt.datetime.utcnow().replace(tzinfo=pytz.UTC) + dt.timedelta(days=1)
-LAST_MODIFIED = dt.datetime.utcnow().replace(tzinfo=pytz.UTC) - dt.timedelta(days=1)
+TEST_END_DATE = dt.datetime.utcnow().replace(tzinfo=pytz.UTC) + dt.timedelta(
+    days=1)
+LAST_MODIFIED = dt.datetime.utcnow().replace(tzinfo=pytz.UTC) - dt.timedelta(
+    days=1)
 VARIATION = '[{"description":"Italian Description","country":"it"}]'
 BM_FIXTURE = "{}Title,Url,Keywords,Match Similar Keywords,State,Description," \
-    "Reserved Keywords,Categories,Start Date,End Date,Country/Region,Use AAD Location," \
-    "Groups,Device & OS,Targeted Variations,Last Modified,Last Modified By,Id\n" \
+    "Reserved Keywords,Categories,Start Date,End Date,Country/Region," \
+    "Use AAD Location,Groups,Device & OS,Targeted Variations,Last Modified," \
+    "Last Modified By,Id\n" \
     "Full Bookmark,http://www.dummyfullurl.com,test1;test2," \
     "true,published,Basic Bookmark Description,rtest1;rtest2,Basic Category," \
     "{},{},de;us,False,d0dc8935-5cfb-47ae-bb41-3b362e6fee97;" \
@@ -57,8 +59,9 @@ BM_FIXTURE = "{}Title,Url,Keywords,Match Similar Keywords,State,Description," \
         LAST_MODIFIED.strftime('%m/%d/%Y')
     )
 
+
 @patch('bookmark.Bookmark')
-def _import_csv_cli(monkeypatch):
+def _import_csv_cli(monkeypatch):  # TODO Not yet working...
     file = open('test.csv', 'w', encoding='utf-8')
     file.write(BM_FIXTURE)
     file.close()

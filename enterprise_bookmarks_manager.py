@@ -2,19 +2,19 @@
 # -*- coding: utf-8 -*-
 
 # The MIT License (MIT)
-# 
+#
 # Copyright (c) 2023, Roland Rickborn (r_2@gmx.net)
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -42,10 +42,12 @@ __version__ = '2.0'
 __url__ = 'https://github.com/gitRigge/EnterpriseBookmarksManager'
 __license__ = 'MIT License (MIT)'
 
+
 def run_from_command_line(args):
-    if args.inputfile == None:
+    if args.inputfile is None:
         candidate = utils.get_most_possible_file()
-        user_input = input('Do you want to continue with \'{}\' (yes/no): '.format(candidate))
+        user_input = input(
+            'Do you want to continue with \'{}\' (yes/no): '.format(candidate))
         if user_input.lower() == 'yes' or user_input.lower() == 'y':
             if candidate.endswith('.xlsx'):
                 filename = '{}'.format(candidate).split('.')[0]
@@ -72,9 +74,11 @@ def run_from_command_line(args):
         output = bm2xls.convert_csv_to_excel(filename)
     print('Output file: {}'.format(output))
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument( 'inputfile', nargs='?', action = 'store', type = str,
-        help = 'Specify input file to read (Excel or CSV)' )
+    parser.add_argument(
+        'inputfile', nargs='?', action='store', type=str,
+        help='Specify input file to read (Excel or CSV)')
     args = parser.parse_args()
     run_from_command_line(args)
