@@ -5,7 +5,8 @@ This app is able to convert Microsoft 365 Admin Center Enterprise Bookmarks CSV 
 The Microsoft 365 Admin Center allows to define so called Enterprise Bookmarks in the section Search & Intelligence, Answers, see [Manage Bookmarks](https://learn.microsoft.com/en-us/microsoftsearch/manage-bookmarks). The GUI of the Admin Center is pretty crappy. As a result, I recommend to export all bookmarks and to edit the bookmarks in Excel. The Enterprise Bookmarks Manager helps to convert the CSV file into an Excel file and vice versa.
 
 ## Build
-Just run makeExe.bat, wait until it ends and have a look at the release folder.
+Just run the make file, wait until it ends and have a look at the release folder.
+```makeExe.bat```
 Or download the latest release from the [GitHub repo release folder](https://github.com/gitRigge/EnterpriseBookmarksManager/raw/master/release/enterprise_bookmarks_manager.zip)
 
 ## Run

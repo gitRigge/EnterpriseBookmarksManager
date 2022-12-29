@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 # 
-# Copyright (c) 2022, Roland Rickborn (r_2@gmx.net)
+# Copyright (c) 2023, Roland Rickborn (r_2@gmx.net)
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@ import os
 from os.path import exists
 
 
-def get_save_filename(suggested_filename=''):
+def get_save_filename(suggested_filename: str):
     retval = ''
     filename_exists = True
     counter = 1

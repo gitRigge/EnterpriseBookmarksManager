@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 # 
-# Copyright (c) 2022, Roland Rickborn (r_2@gmx.net)
+# Copyright (c) 2023, Roland Rickborn (r_2@gmx.net)
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -47,29 +47,16 @@ class Enums(object):
 
     countries = {}
 
-    columns = {
-        'A': 'Title',
-        'B': 'Url',
-        'C': 'Keywords',
-        'D': 'Match Similar Keywords',
-        'E': 'State',
-        'F': 'Description',
-        'G': 'Reserved Keywords',
-        'H': 'Categories',
-        'I': 'Start Date',
-        'J': 'End Date',
-        'K': 'Country/Region',
-        'L': 'Use AAD Location',
-        'M': 'Groups',
-        'N': 'Device & OS',
-        'O': 'Targeted Variations',
-        'P': 'Last Modified',
-        'Q': 'Last Modified By',
-        'R': 'Id'
+    variations = {
+        'title': 'Title',
+        'url': 'URL',
+        'description': 'Description',
+        'country': 'Country',
+        'device': 'Device'
     }
 
     def __init__(self):
-            all_countries = list(pycountry.countries)
-            for country in all_countries:
-                self.countries[country.alpha_2.lower()] = country.name
+        all_countries = list(pycountry.countries)
+        for country in all_countries:
+            self.countries[country.alpha_2.lower()] = country.name
 

@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 # 
-# Copyright (c) 2022, Roland Rickborn (r_2@gmx.net)
+# Copyright (c) 2023, Roland Rickborn (r_2@gmx.net)
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -26,203 +26,93 @@
 # ---------------------------------------------------------------------------
 
 import csv
+import datetime as dt
 import math
 import sys
-from datetime import datetime
 
 import openpyxl
 
-import enums
+import bookmark
+import bookmark_shelf
 import utils
 
 
-def write_init_output_file(outputFilename='', outputColumns={}):
+def write_init_output_file(outputFilename: str, outputColumns: list):
     outputFilename = utils.get_save_filename(outputFilename)
     retval = outputFilename
     with open(outputFilename, 'w', newline='', encoding='utf-8') as csvfile:
         csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        _l = list(outputColumns.values())
-        _l[0] = u'\uFEFF' + _l[0]
-        csvwriter.writerow(_l)
+        outputColumns[0] = u'\uFEFF' + outputColumns[0]
+        csvwriter.writerow(outputColumns)
     return retval
 
-def append_to_output_file(outputfile='', data={}):
+def append_to_output_file(outputfile: str, data: list):
     with open(outputfile, 'a', newline='', encoding='utf-8') as csvfile:
         csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         new_line = []
-        for item in list(data.values()):
+        for item in data:
             new_line.append(str(item).replace('\n',''))
         csvwriter.writerow(new_line)
 
-def remove_duplicate_keywords(input=''):
-    retval = ''
-    unique_keywords = []
-    for item in input.split(';'):
-        if not item.lower() in unique_keywords:
-            unique_keywords.append(item.lower())
-    retval = ';'.join(unique_keywords)
-    return retval
-
-def convert_excel_to_csv(filename=''):
-    retval = []
+def read_input_file(filename: str):
+    retval = bookmark_shelf.BookmarkShelf()
     wb = openpyxl.load_workbook('{}.xlsx'.format(filename))
     ws = wb.active
-    end_of_ws_reached = False
-    counter = 2
+    for r in range(2,ws.max_row):
+        my_bookmark = bookmark.Bookmark(
+            title = ws['{}{}'.format('A',r)].value,
+            url = ws['{}{}'.format('B',r)].value,
+            keywords = ws['{}{}'.format('C',r)].value,
+            match_similar_keywords = ws['{}{}'.format('D',r)].value,
+            state = ws['{}{}'.format('E',r)].value,
+            description = ws['{}{}'.format('F',r)].value,
+            reserved_keywords = ws['{}{}'.format('G',r)].value,
+            categories = ws['{}{}'.format('H',r)].value,
+            start_date = ws['{}{}'.format('I',r)].value,
+            end_date = ws['{}{}'.format('J',r)].value,
+            country_region = ws['{}{}'.format('K',r)].value,
+            use_aad_location = ws['{}{}'.format('L',r)].value,
+            groups = ws['{}{}'.format('M',r)].value,
+            device_and_os = ws['{}{}'.format('N',r)].value,
+            targeted_variations = ws['{}{}'.format('O',r)].value,
+            last_modified = ws['{}{}'.format('P',r)].value,
+            last_modified_by = ws['{}{}'.format('Q',r)].value,
+            id = ws['{}{}'.format('R',r)].value
+        )
+        retval.add_bookmark(my_bookmark)
+    return retval
+
+def convert_excel_to_csv(filename: str):
+    retval = []
+    my_output_columns = list(bookmark.Bookmark.get_columns().values())
+    my_shelf = read_input_file(filename)
     limit = 3000
-    data_to_be_appended = []
-    titles = []
-    while not end_of_ws_reached:
-        _v = ws['A{}'.format(counter)].value
-        if _v == None:
-            end_of_ws_reached = True
-        else:
-            if not ws['A{}'.format(counter)].value == None and ws['A{}'.format(counter)].value not in titles and len(ws['A{}'.format(counter)].value) < 60:
-                titles.append(ws['A{}'.format(counter)].value)
-                my_title = ws['A{}'.format(counter)].value
-            elif ws['A{}'.format(counter)].value == None:
-                break
-            elif ws['A{}'.format(counter)].value in titles:
-                print('Title "{}" already exists ({})'.format(ws['A{}'.format(counter)].value, counter))
-                sys.exit()
-            elif len(ws['A{}'.format(counter)].value) >= 60:
-                my_title = '{}...'.format(ws['A{}'.format(counter)].value[0:57])
-            if not ws['B{}'.format(counter)].value == None:
-                my_url = ws['B{}'.format(counter)].value
-            else:
-                my_url = ''
-            if not ws['C{}'.format(counter)].value == None:
-                my_keywords = remove_duplicate_keywords(ws['C{}'.format(counter)].value)
-            else:
-                my_keywords = ''
-            if not ws['D{}'.format(counter)].value == None:
-                my_match_similar_keywords = ws['D{}'.format(counter)].value
-            else:
-                my_match_similar_keywords = ''
-            if not ws['E{}'.format(counter)].value == None:
-                my_state = ws['E{}'.format(counter)].value
-            else:
-                my_state = ''
-            if not ws['F{}'.format(counter)].value == None:
-                my_description = ws['F{}'.format(counter)].value
-            else:
-                my_description = ''
-            if not ws['G{}'.format(counter)].value == None:
-                my_reserved_keywords = ws['G{}'.format(counter)].value
-            else:
-                my_reserved_keywords = ''
-            if not ws['H{}'.format(counter)].value == None:
-                my_categories = ws['H{}'.format(counter)].value
-            else:
-                my_categories = ''
-            if not ws['I{}'.format(counter)].value == None:
-                try:
-                    _d = datetime.strptime(ws['I{}'.format(counter)].value,'%Y-%m-%dT%H:%M:%S+00') #Date, 2022-11-27T07:00:00+00
-                    my_start_date = _d.strftime('%Y-%m-%dT%H:%M:%S+00')
-                except:
-                    try:
-                        my_start_date = ws['I{}'.format(counter)].value.strftime('%Y-%m-%dT%H:%M:%S+00')
-                    except:
-                        my_start_date = ws['I{}'.format(counter)]
-            else:
-                my_start_date = ''
-            if not ws['J{}'.format(counter)].value == None:
-                try:
-                    _d = datetime.strptime(ws['J{}'.format(counter)].value,'%Y-%m-%dT%H:%M:%S+00') #Date, 2022-11-28T19:00:00+00
-                    my_end_date = _d.strftime('%Y-%m-%dT%H:%M:%S+00')
-                except:
-                    try:
-                        my_end_date = ws['J{}'.format(counter)].value.strftime('%Y-%m-%dT%H:%M:%S+00')
-                    except:
-                        my_end_date = ws['J{}'.format(counter)].value
-            else:
-                my_end_date = ''
-            if not ws['K{}'.format(counter)].value == None:
-                my_country_region = ws['K{}'.format(counter)].value
-            else:
-                my_country_region = ''
-            if not ws['L{}'.format(counter)].value == None:
-                my_use_AAD_location = ws['L{}'.format(counter)].value
-            else:
-                my_use_AAD_location = ''
-            if not ws['M{}'.format(counter)].value == None:
-                my_groups = ws['M{}'.format(counter)].value
-            else:
-                my_groups = ''
-            if not ws['N{}'.format(counter)].value == None:
-                my_device_and_OS = ws['N{}'.format(counter)].value
-            else:
-                my_device_and_OS = ''
-            if not ws['O{}'.format(counter)].value == None:
-                my_targeted_variations = ws['O{}'.format(counter)].value
-            else:
-                my_targeted_variations = ''
-            if not ws['P{}'.format(counter)].value == None:
-                try:
-                    _d = datetime.strptime(ws['P{}'.format(counter)].value,'%m/%d/%Y') #Date, 11/24/2022
-                    my_start_date = _d.strftime('%m/%d/%Y')
-                except:
-                    try:
-                        my_last_modified = ws['P{}'.format(counter)].value.strftime('%m/%d/%Y')
-                    except:
-                        my_last_modified = ws['P{}'.format(counter)]
-            else:
-                my_last_modified = ''
-            if not ws['Q{}'.format(counter)].value == None:
-                my_last_modified_by = ws['Q{}'.format(counter)].value
-            else:
-                my_last_modified_by = ''
-            if not ws['R{}'.format(counter)].value == None:
-                my_id = ws['R{}'.format(counter)].value
-            else:
-                my_id = ''
-            my_data = {
-                'A': my_title,
-                'B': my_url,
-                'C': my_keywords,
-                'D': my_match_similar_keywords,
-                'E': my_state,
-                'F': my_description,
-                'G': my_reserved_keywords,
-                'H': my_categories,
-                'I': my_start_date,
-                'J': my_end_date,
-                'K': my_country_region,
-                'L': my_use_AAD_location,
-                'M': my_groups,
-                'N': my_device_and_OS,
-                'O': my_targeted_variations,
-                'P': my_last_modified,
-                'Q': my_last_modified_by,
-                'R': my_id
-            }
-            data_to_be_appended.append(my_data)
-            counter += 1
     counter = 0
-    number_of_files = math.ceil(len(data_to_be_appended)/limit)
+    number_of_files = math.ceil(len(my_shelf.get_bookmarks())/limit)
     if number_of_files > 1:
         for i in range(0,number_of_files):
             my_output_filename = write_init_output_file('{}_{}.csv'.format(filename,i+1), my_output_columns)
-            print('Output file: {}'.format(my_output_filename))
             retval.append(my_output_filename)
             for j in range(0,limit):
-                if counter < len(data_to_be_appended):
-                    append_to_output_file(my_output_filename, data_to_be_appended[counter])
+                my_keys = list(my_shelf.get_bookmarks())
+                if counter < len(my_keys):
+                    my_bm = my_shelf.get_bookmark(my_keys[counter])
+                    append_to_output_file(my_output_filename, my_bm.to_string())
                     counter += 1
     else:
         my_output_filename = write_init_output_file('{}.csv'.format(filename), my_output_columns)
-        print('Output file: {}'.format(my_output_filename))
         retval.append(my_output_filename)
         for j in range(0,limit):
-            if counter < len(data_to_be_appended):
-                append_to_output_file(my_output_filename, data_to_be_appended[counter])
+            my_keys = list(my_shelf.get_bookmarks())
+            if counter < len(my_keys):
+                my_bm = my_shelf.get_bookmark(my_keys[counter])
+                append_to_output_file(my_output_filename, my_bm.to_string())
                 counter += 1
-    return retval
-
-my_output_columns = enums.Enums.columns
+    return ', '.join(retval)
 
 filename = ''
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         filename = sys.argv[1].split('.xlsx')[0]
         output = convert_excel_to_csv(filename)
+        print('Output file: {}'.format(output))

@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 # 
-# Copyright (c) 2022, Roland Rickborn (r_2@gmx.net)
+# Copyright (c) 2023, Roland Rickborn (r_2@gmx.net)
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -26,21 +26,23 @@
 # ---------------------------------------------------------------------------
 
 import csv
+import datetime as dt
+import locale
 import sys
-from datetime import datetime
 
 import openpyxl
+import pytz
 
-import enums
+import bookmark
 import utils
 
 
-def read_input_file(inputFilename=''):
-    global my_output_columns
+def read_input_file(input_filename: str):
     retval = {}
+    my_output_columns = bookmark.Bookmark.get_columns()
     header_row_keys = list(my_output_columns.keys())
     header_row_values = list(my_output_columns.values())
-    with open(inputFilename, newline='', encoding='utf-8') as csv_file:
+    with open(input_filename, newline='', encoding='utf-8') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         line_count = 0
         for row in csv_reader:
@@ -48,7 +50,7 @@ def read_input_file(inputFilename=''):
                 for col in range(0,len(row)):
                     if not row[col].endswith(header_row_values[col]):
                         print('Error')
-                        break
+                        sys.exit(2)
             else:
                 t = {}
                 id = row[-1]
@@ -58,7 +60,38 @@ def read_input_file(inputFilename=''):
             line_count += 1
     return retval
 
-def convert_csv_to_excel(filename=''):
+def get_date_by_str(datetimestr: str):
+    retval = ''
+    if 'T' in datetimestr and '+' in datetimestr:
+        try:
+            d = dt.datetime.strptime(datetimestr+'00', '%Y-%m-%dT%H:%M:%S%z')
+            retval = d.replace(tzinfo=None)
+        except:
+            retval = datetimestr
+    else:
+        try:
+            d = dt.datetime.strptime(datetimestr, '%m/%d/%Y')
+            retval = d.replace(tzinfo=None)
+        except:
+            retval = datetimestr
+    return retval
+
+def get_date_format_by_str(datetimestr: str):
+    retval = ''
+    loc = locale.getlocale()
+    if 'T' in datetimestr and '+' in datetimestr:
+        if loc[0].startswith('de'):
+            retval = 'dd.mm.yyyy HH:MM:SS'
+        else:
+            retval = 'mm/dd/yyyy HH:MM:SS'
+    elif '/' in datetimestr:
+        if loc[0].startswith('de'):
+            retval = 'dd.mm.yyyy'
+        else:
+            retval = 'mm/dd/yyyy'
+    return retval
+
+def convert_csv_to_excel(filename: str):
     my_input_data = read_input_file('{}.csv'.format(filename))
     wb = openpyxl.Workbook()
     wb.iso_dates = True
@@ -70,28 +103,25 @@ def convert_csv_to_excel(filename=''):
         cell_number = item+1
         cell_chars = list(my_input_data[bookmark_id].keys())
         for cell_char in cell_chars:
-            if cell_number == 1:
+            if cell_number == 1: # Write header line
                 ws['{}{}'.format(cell_char, cell_number)] = my_input_data[bookmark_id][cell_char]
                 ws['{}{}'.format(cell_char, cell_number)].font = openpyxl.styles.Font(bold = True)
-            elif cell_char == 'P':
-                try:
-                    d = datetime.strptime(my_input_data[bookmark_id][cell_char], '%m/%d/%Y')
-                    ws['{}{}'.format(cell_char, cell_number)] = d
-                    ws['{}{}'.format(cell_char, cell_number)].number_format = 'mm.dd.yyyy'
-                except:
-                    ws['{}{}'.format(cell_char, cell_number)] = my_input_data[bookmark_id][cell_char]
+            elif cell_char in ['I', 'J', 'P']: # Detect datetime objects
+                my_date = get_date_by_str(my_input_data[bookmark_id][cell_char])
+                ws['{}{}'.format(cell_char, cell_number)] = my_date
+                if isinstance(my_date, dt.datetime):
+                    my_date_format = get_date_format_by_str(my_input_data[bookmark_id][cell_char])
+                    ws['{}{}'.format(cell_char, cell_number)].number_format = my_date_format
             else:
                 ws['{}{}'.format(cell_char, cell_number)] = my_input_data[bookmark_id][cell_char]
     ws.auto_filter.ref = ws.dimensions
     new_filename = utils.get_save_filename('{}.xlsx'.format(filename))
     wb.save(new_filename)
-    print('Output file: {}'.format(new_filename))
     return new_filename
-
-my_output_columns = enums.Enums.columns
 
 filename = ''
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         filename = sys.argv[1].split('.csv')[0]
         output = convert_csv_to_excel(filename)
+        print('Output file: {}'.format(output))
