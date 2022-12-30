@@ -36,16 +36,7 @@ if %ERRORLEVEL% == 0 (
     echo [1mPrint Coverage Report[0m
     coverage report -m
     echo [1mFlake8 Lintering[0m
-    set MYPYFILES=
-    cd tests
-    for /F %%i in ('dir /b *.py') do (
-        set MYPYFILES=!MYPYFILES!tests/%%i 
-    )
-    cd ..
-    for /F %%i in ('dir /b *.py') do (
-        set MYPYFILES=!MYPYFILES!%%i 
-    )
-    flake8 --count --statistics --verbose --benchmark !MYPYFILES!
+    flake8 --count --statistics --verbose --benchmark tests scr
     if %ERRORLEVEL% == 0 (
         echo [1mNo Linting Errors with Flake8[0m
         echo [1mBuild Executable[0m

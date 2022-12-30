@@ -25,7 +25,7 @@
 #
 # ---------------------------------------------------------------------------
 
-import bookmark
+import src.ebm.bookmark
 
 
 class BookmarkShelf(object):
@@ -35,7 +35,7 @@ class BookmarkShelf(object):
         self.keywords = []
         self.reserved_keywords = []
 
-    def add_bookmark(self, bm: bookmark.Bookmark):
+    def add_bookmark(self, bm: src.ebm.bookmark.Bookmark):
         if self.validate_keywords(bm.keywords):
             self.keywords = self.keywords + bm.keywords
         if self.validate_reserved_keywords(bm.reserved_keywords):

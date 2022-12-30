@@ -25,11 +25,13 @@
 #
 # ---------------------------------------------------------------------------
 
-import validators
-import enums
 import datetime
 import json
+
 import pytz
+import validators
+
+import src.ebm.enums as enums
 
 
 class Bookmark(object):

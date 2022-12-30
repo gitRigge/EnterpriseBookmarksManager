@@ -27,7 +27,7 @@
 
 import datetime as dt
 
-import bm2xls
+import src.ebm.bm2xls as bm2xls
 
 END_DATE = '2022-12-29T07:30:00+00'
 LAST_MODIFIED = '12/28/2022'

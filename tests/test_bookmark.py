@@ -30,7 +30,7 @@ import datetime as dt
 import pytest
 import pytz
 
-import bookmark
+import src.ebm.bookmark as bookmark
 
 
 class TestBookmark(object):

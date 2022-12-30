@@ -25,7 +25,7 @@
 #
 # ---------------------------------------------------------------------------
 
-import xls2bm
+import src.ebm.xls2bm as xls2bm
 
 
 def test_to_do():

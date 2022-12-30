@@ -35,7 +35,7 @@ from unittest.mock import patch
 
 import pytz
 
-import enterprise_bookmarks_manager as ebm
+import src.ebm.enterprise_bookmarks_manager as ebm
 
 TEST_START_DATE = dt.datetime.utcnow().replace(tzinfo=pytz.UTC)
 TEST_END_DATE = dt.datetime.utcnow().replace(tzinfo=pytz.UTC) + dt.timedelta(

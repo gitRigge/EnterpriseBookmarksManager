@@ -25,7 +25,7 @@
 #
 # ---------------------------------------------------------------------------
 
-import enums
+import src.ebm.enums as enums
 
 
 class TestEnums(object):

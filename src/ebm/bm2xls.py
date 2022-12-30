@@ -32,8 +32,8 @@ import sys
 
 import openpyxl
 
-import bookmark
-import utils
+import src.ebm.bookmark as bookmark
+import src.ebm.utils as utils
 
 
 def read_input_file(input_filename: str):

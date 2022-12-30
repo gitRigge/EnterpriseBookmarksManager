@@ -32,9 +32,9 @@
 import argparse
 import sys
 
-import bm2xls
-import utils
-import xls2bm
+import src.ebm.bm2xls as bm2xls
+import src.ebm.utils as utils
+import src.ebm.xls2bm as xls2bm
 
 __author__ = 'Roland Rickborn'
 __copyright__ = 'Copyright (c) 2023 {}'.format(__author__)

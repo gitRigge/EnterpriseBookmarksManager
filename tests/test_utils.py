@@ -26,9 +26,9 @@
 # ---------------------------------------------------------------------------
 
 import os
-
-import utils
 import time
+
+import src.ebm.utils as utils
 
 
 class TestFilenameSuggestion(object):
