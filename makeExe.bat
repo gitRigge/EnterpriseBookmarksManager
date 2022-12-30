@@ -30,39 +30,54 @@ set PYTHONPATH=c:\Python310\Lib\
 set PYTHONHOME=c:\Python310\
 echo [1mInstall Requirements[0m
 pip install -r requirements.txt
+GOTO :TESTING
+
+:TESTING
 echo [1mRun Tests[0m
 coverage run -m pytest .\tests
 if %ERRORLEVEL% == 0 (
     echo [1mPrint Coverage Report[0m
     coverage report -m
-    echo [1mFlake8 Lintering[0m
-    flake8 --count --statistics --verbose --benchmark tests scr
-    if %ERRORLEVEL% == 0 (
-        echo [1mNo Linting Errors with Flake8[0m
-        echo [1mBuild Executable[0m
-        IF EXIST release\enterprise_bookmarks_manager.zip DEL /F release\enterprise_bookmarks_manager.zip
-        pyinstaller ^
-            --onefile ^
-            --distpath bin ^
-            --clean ^
-            --log-level INFO ^
-            --name enterprise_bookmarks_manager ^
-            --distpath release ^
-            --hidden-import openpyxl ^
-            --hidden-import xls2bm ^
-            --hidden-import bm2xls ^
-            --hidden-import enums ^
-            --hidden-import utils ^
-            enterprise_bookmarks_manager.py
-        powershell Compress-Archive release\enterprise_bookmarks_manager.exe release\enterprise_bookmarks_manager.zip
-        del release\enterprise_bookmarks_manager.exe
-        del /F /Q enterprise_bookmarks_manager.spec
-        rmdir /Q /S __pycache__
-        rmdir /Q /S build
-    ) else (
-        echo [1mThere were Errors while code style checking with Flake8 - Abort[0m
-    )
+    GOTO :STYLECHECK
 ) else (
     echo [1mThere were Errors in Tests - Abort[0m
+    GOTO :DONE
 )
+
+:STYLECHECK
+echo [1mFlake8 Lintering[0m
+flake8 --count --statistics --verbose --benchmark tests src
+GOTO :LINTING
+
+:LINTING
+if %ERRORLEVEL% == 0 (
+    echo [1mBuild Executable[0m
+    IF EXIST release\enterprise_bookmarks_manager.zip DEL /F release\enterprise_bookmarks_manager.zip
+    pyinstaller ^
+        --onefile ^
+        --distpath .\bin ^
+        --workpath .\build ^
+        --paths %cd%\src\ebm\ ^
+        --clean ^
+        --log-level INFO ^
+        --name enterprise_bookmarks_manager ^
+        --distpath release ^
+        --hidden-import openpyxl ^
+        --hidden-import pytz ^
+        --hidden-import validators ^
+        --hidden-import pycountry ^
+        --add-data %cd%\src\ebm\*.py;src\ebm\ ^
+        src/ebm/enterprise_bookmarks_manager.py
+    powershell Compress-Archive release\enterprise_bookmarks_manager.exe release\enterprise_bookmarks_manager.zip
+    del release\enterprise_bookmarks_manager.exe
+    del /F /Q enterprise_bookmarks_manager.spec
+    rmdir /Q /S __pycache__
+    rmdir /Q /S build
+    GOTO :DONE
+) else (
+    echo [1mThere were Errors while code style checking with Flake8 - Abort[0m
+    GOTO :DONE
+)
+
+:DONE
 pause
