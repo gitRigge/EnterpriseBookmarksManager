@@ -1,4 +1,4 @@
-# EnterpriseBookmarksManager
+# Enterprise Bookmarks Manager
 This app is able to convert Microsoft 365 Admin Center Enterprise Bookmarks CSV export to Excel and vice versa.
 
 ## Introduction
