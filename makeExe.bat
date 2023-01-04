@@ -29,28 +29,23 @@ set PATH=c:\Python310\;c:\Python310\Lib\site-packages\;c:\Python310\Scripts\;%PA
 set PYTHONPATH=c:\Python310\Lib\
 set PYTHONHOME=c:\Python310\
 echo [1mInstall Requirements[0m
-pip install -r requirements.txt
+pip install tox
 GOTO :TESTING
 
 :TESTING
 echo [1mRun Tests[0m
-coverage erase
-pytest -v --junitxml=junit/test-results.xml --cov src.ebm --cov-report=xml --cov-report=html
+rmdir /Q /S coverage
+tox
 if %ERRORLEVEL% == 0 (
     echo [1mPrint Coverage Report[0m
     coverage report -m
-    GOTO :STYLECHECK
+    GOTO :BUILDING
 ) else (
     echo [1mThere were Errors in Tests - Abort[0m
     GOTO :DONE
 )
 
-:STYLECHECK
-echo [1mFlake8 Lintering[0m
-flake8 --count --statistics --verbose --benchmark tests src
-GOTO :LINTING
-
-:LINTING
+:BUILDING
 if %ERRORLEVEL% == 0 (
     echo [1mBuild Executable[0m
     IF EXIST release\enterprise_bookmarks_manager.zip DEL /F release\enterprise_bookmarks_manager.zip
