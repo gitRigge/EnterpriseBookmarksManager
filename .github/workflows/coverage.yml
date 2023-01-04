@@ -11,11 +11,6 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - name: Get Cover 
-        uses: orgoro/coverage@v3
-        with:
-          coverageFile: coverage/coverage.xml
-          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Coverage Badge
         working-directory: ./coverage
         uses: tj-actions/coverage-badge-py@v1.8
