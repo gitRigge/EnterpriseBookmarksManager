@@ -29,7 +29,7 @@ set PATH=c:\Python310\;c:\Python310\Lib\site-packages\;c:\Python310\Scripts\;%PA
 set PYTHONPATH=c:\Python310\Lib\
 set PYTHONHOME=c:\Python310\
 echo [1mInstall Requirements[0m
-pip install tox
+python -m pip install tox
 GOTO :TESTING
 
 :TESTING
