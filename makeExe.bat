@@ -34,7 +34,8 @@ GOTO :TESTING
 
 :TESTING
 echo [1mRun Tests[0m
-coverage run -m pytest .\tests
+coverage erase
+pytest -v --junitxml=junit/test-results.xml --cov src.ebm --cov-report=xml --cov-report=html
 if %ERRORLEVEL% == 0 (
     echo [1mPrint Coverage Report[0m
     coverage report -m

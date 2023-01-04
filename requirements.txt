@@ -4,6 +4,7 @@ openpyxl==3.0.10
 pycountry==22.3.5
 pyinstaller==4.10
 pytest==7.0.1
+pytest-cov==4.0.0
 pytest-mock==3.6.1
 pytz==2022.2.1
 tox==3.28.0
