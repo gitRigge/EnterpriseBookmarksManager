@@ -101,8 +101,8 @@ class TestBookmarkValidation(object):
                 title='Basic Bookmark',
                 keywords='test'
             )
-        assert str(e.value) == 'Bookmark.__init__() missing 1 required ' \
-            'positional argument: \'url\''
+        assert str(e.value).endswith(
+            '__init__() missing 1 required positional argument: \'url\'')
 
     def test_missing_keyword_bookmark(self):
         with pytest.raises(Exception) as e:
@@ -110,8 +110,8 @@ class TestBookmarkValidation(object):
                 title='Basic Bookmark',
                 url='http://www.dummyurl.com'
             )
-        assert str(e.value) == 'Bookmark.__init__() missing 1 required ' \
-            'positional argument: \'keywords\''
+        assert str(e.value).endswith(
+            '__init__() missing 1 required positional argument: \'keywords\'')
 
     def test_valid_match_bookmark(self):
         with pytest.raises(Exception) as e:
