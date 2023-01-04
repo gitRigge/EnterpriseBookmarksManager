@@ -9,9 +9,6 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v2
-        with: 
-          fetch-depth: 0
       - name: Coverage Badge
         working-directory: ./coverage
         uses: tj-actions/coverage-badge-py@v1.8
