@@ -1,7 +1,7 @@
 # Enterprise Bookmarks Manager
 
 ![Tests](https://github.com/gitRigge/EnterpriseBookmarksManager/actions/workflows/tests.yml/badge.svg)
-![Coverage](https://github.com/gitRigge/EnterpriseBookmarksManager/coverage/coverage.svg)
+![Coverage](https://raw.githubusercontent.com/gitRigge/EnterpriseBookmarksManager/main/coverage/coverage.svg)
 
 This app is able to convert Microsoft 365 Admin Center Enterprise Bookmarks CSV export to Excel and vice versa.
 
