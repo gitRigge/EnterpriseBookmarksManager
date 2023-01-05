@@ -24,13 +24,9 @@ REM
 REM ---------------------------------------------------------------------------
 TITLE Build Executable
 setlocal EnableDelayedExpansion 
-echo [1mSet Python Path Variables[0m
-set PATH=c:\Python38\;c:\Python38\Lib\site-packages\;c:\Python38\Scripts\;%PATH%
-set PYTHONPATH=c:\Python38\Lib\
-set PYTHONHOME=c:\Python38\
 echo [1mInstall Requirements[0m
 python.exe -m pip install --upgrade pip
-python -m pip install tox
+python -m pip install -r requirements.txt
 GOTO :TESTING
 
 :TESTING
@@ -52,13 +48,12 @@ if %ERRORLEVEL% == 0 (
     IF EXIST release\enterprise_bookmarks_manager.zip DEL /F release\enterprise_bookmarks_manager.zip
     pyinstaller ^
         --onefile ^
-        --distpath .\bin ^
+        --distpath .\release ^
         --workpath .\build ^
         --paths %cd%\src\ebm\ ^
         --clean ^
         --log-level INFO ^
         --name enterprise_bookmarks_manager ^
-        --distpath release ^
         --hidden-import openpyxl ^
         --hidden-import pytz ^
         --hidden-import validators ^
