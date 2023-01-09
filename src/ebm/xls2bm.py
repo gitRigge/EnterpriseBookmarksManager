@@ -61,7 +61,7 @@ def read_input_file(filename: str):
     retval = bookmark_shelf.BookmarkShelf()
     wb = openpyxl.load_workbook('{}.xlsx'.format(filename))
     ws = wb.active
-    for r in range(2, ws.max_row):
+    for r in range(2, ws.max_row+1):
         my_bookmark = bookmark.Bookmark(
             title=ws['{}{}'.format('A', r)].value,
             url=ws['{}{}'.format('B', r)].value,
