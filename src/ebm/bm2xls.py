@@ -98,7 +98,7 @@ def convert_csv_to_excel(filename: str):
     wb = openpyxl.Workbook()
     wb.iso_dates = True
     ws = wb.active
-    ws.title = filename
+    ws.title = filename.split('\\')[-1]
     my_input_data_keys = list(my_input_data.keys())
     for item in range(0, len(my_input_data_keys)):
         bookmark_id = my_input_data_keys[item]
