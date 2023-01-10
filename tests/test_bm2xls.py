@@ -35,11 +35,9 @@ LAST_MODIFIED = '12/28/2022'
 CSV_FILE = 'Title,Url,Keywords,Match Similar Keywords,State,Description,'\
     'Reserved Keywords,Categories,Start Date,End Date,Country/Region,'\
     'Use AAD Location,Groups,Device & OS,Targeted Variations,Last Modified,'\
-    'Last Modified By,Id\n'\
-    'Test,https://exensio.sharepoint.de/sites/hr/SitePages/Test-Seite.aspx,'\
-    'test;testrr;test_rr,true,published,Das ist nur ein Test von Roland,,,,,,'\
-    'False,,,,12/01/2022,admin@0hqnv.onmicrosoft.com,'\
-    'dd8901da-7f6d-4c54-9251-a72a0ee48d52'
+    'Last Modified By,Id\nTest,http://test-rr.de,test;testrr;test_rr,true,'\
+    'published,Das ist nur ein Test von Roland,,,,,,False,,,,12/01/2022,'\
+    'usr@test.com,dd8901da-7f6d-4c54-9251-a11a0ee48d52'
 
 
 class TestBm2xlxReadInput(object):
