@@ -28,7 +28,6 @@
 import csv
 import datetime as dt
 import locale
-import sys
 
 import openpyxl
 
@@ -40,24 +39,31 @@ def read_input_file(input_filename: str):
     retval = {}
     my_output_columns = bookmark.Bookmark.get_columns()
     header_row_keys = list(my_output_columns.keys())
-    header_row_values = list(my_output_columns.values())
+    header_checked = False
     with open(input_filename, newline='', encoding='utf-8') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
-        line_count = 0
         for row in csv_reader:
-            if row == 0:
-                for col in range(0, len(row)):
-                    if not row[col].endswith(header_row_values[col]):
-                        print('Error')
-                        sys.exit(2)
-            else:
-                t = {}
-                id = row[-1]
-                for col in range(0, len(row)):
-                    t[header_row_keys[col]] = row[col]
-                retval[id] = t
-            line_count += 1
+            if not header_checked:
+                if validate_header(row):
+                    header_checked = True
+                else:
+                    raise ValidationError(
+                        'Header of CSV file not correct')
+            t = {}
+            id = row[-1]
+            for col in range(0, len(row)):
+                t[header_row_keys[col]] = row[col]
+            retval[id] = t
     return retval
+
+
+def validate_header(header_row: list):
+    my_output_columns = bookmark.Bookmark.get_columns()
+    header_row_values = list(my_output_columns.values())
+    if header_row_values == header_row:
+        return True
+    else:
+        return False
 
 
 def get_date_by_str(datetimestr: str):
@@ -112,6 +118,7 @@ def convert_csv_to_excel(filename: str):
                     cell_char, cell_number)].font = openpyxl.styles.Font(
                         bold=True)
             elif cell_char in ['I', 'J', 'P']:  # Detect datetime objects
+                print('HELLO')
                 my_date = get_date_by_str(
                     my_input_data[bookmark_id][cell_char])
                 ws['{}{}'.format(cell_char, cell_number)] = my_date
@@ -130,9 +137,5 @@ def convert_csv_to_excel(filename: str):
     return new_filename
 
 
-filename = ''
-if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        filename = sys.argv[1].split('.csv')[0]
-        output = convert_csv_to_excel(filename)
-        print('Output file: {}'.format(output))
+class ValidationError(Exception):
+    pass

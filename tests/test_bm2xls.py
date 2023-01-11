@@ -34,6 +34,15 @@ import pytest
 import src.ebm.bm2xls as bm2xls
 
 FILENAME = 'testfile'
+HEADER_GOOD = 'Title,Url,Keywords,Match Similar Keywords,'\
+    'State,Description,Reserved Keywords,Categories,'\
+    'Start Date,End Date,Country/Region,Use AAD Location,'\
+    'Groups,Device & OS,Targeted Variations,Last Modified,'\
+    'Last Modified By,Id'
+HEADER_BAD = 'Title,Url,Keywords,Match Similar Keywords,'\
+    'State,Description,Reserved Keywords,Categories,'\
+    'Start Date,End Date,Country/Region,Use AAD Location,'\
+    'Groups,Device & OS,Targeted Variations,Last Modified,Id'
 TITLE = 'Test'
 URL = 'http://test-rr.de'
 KEYWORDS = 'test;testrr;test_rr'
@@ -45,12 +54,8 @@ USE_AAD_LOCATION = 'False'
 LAST_MODIFIED = '12/28/2022'
 LAST_MODIFIED_BY = 'usr@test.com'
 ID = 'dd8901da-7f6d-4c54-9251-a11a0ee48d52'
-CSV_FILE = 'Title,Url,Keywords,Match Similar Keywords,'\
-    'State,Description,Reserved Keywords,Categories,'\
-    'Start Date,End Date,Country/Region,Use AAD Location,'\
-    'Groups,Device & OS,Targeted Variations,Last Modified,'\
-    'Last Modified By,Id\n'\
-    '{0},{1},{2},{3},{4},{5},,,,{6},,{7},,,,{8},{9},{10}'.format(
+CSV_FILE = '{0}\n{1},{2},{3},{4},{5},{6},,,,{7},,{8},,,,{9},{10},{11}'.format(
+        HEADER_GOOD,
         TITLE,
         URL,
         KEYWORDS,
@@ -85,9 +90,20 @@ class TestBm2xlxReadInput(object):
         assert retval[ID]['D'] == MATCH_SIMILAR_KEYWORDS
         assert retval[ID]['E'] == STATE
         assert retval[ID]['F'] == DESCRIPTION
+        assert retval[ID]['J'] == END_DATE
         assert retval[ID]['L'] == USE_AAD_LOCATION
         assert retval[ID]['P'] == LAST_MODIFIED
         assert retval[ID]['Q'] == LAST_MODIFIED_BY
+
+    def test_validate_header_good(self):
+        header_row = HEADER_GOOD.split(',')
+        retval = bm2xls.validate_header(header_row)
+        assert retval is True
+
+    def test_validate_header_bad(self):
+        header_row = HEADER_BAD.split(',')
+        retval = bm2xls.validate_header(header_row)
+        assert retval is False
 
 
 class TestBm2xlxWriteXlsx(object):
