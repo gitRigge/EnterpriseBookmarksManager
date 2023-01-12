@@ -277,57 +277,22 @@ class TestBookmarkValidation(object):
         assert str(e.value) == 'URL of \'{}\' could ' \
             'not be validated'.format(fix.TITLE_GOOD)
 
-    def test_targeted_variations_1_bookmark(self):
+    @pytest.mark.parametrize('variation, response', [
+        (fix.VARIATION_BAD_1, 'Variation Country \'{}\''.format(
+            fix.COUNTRY_BAD)),
+        (fix.VARIATION_BAD_2, 'Variations of \'{}\''.format(fix.TITLE_GOOD)),
+        (fix.VARIATION_BAD_3, 'Variation Title'),
+        (fix.VARIATION_BAD_4, 'Variation URL'),
+        (fix.VARIATION_BAD_5, 'Variation Device')])
+    def test_targeted_variations_bookmark(self, variation, response):
         with pytest.raises(Exception) as e:
             bookmark.Bookmark(
                 title=fix.TITLE_GOOD,
                 url=fix.URL_GOOD,
                 keywords=fix.KEYWORDS,
-                targeted_variations=fix.VARIATION_BAD_1
+                targeted_variations=variation
             )
-        assert str(e.value) == 'Variation Country \'aa\' could ' \
-            'not be validated'
-
-    def test_targeted_variations_2_bookmark(self):
-        with pytest.raises(Exception) as e:
-            bookmark.Bookmark(
-                title=fix.TITLE_GOOD,
-                url=fix.URL_GOOD,
-                keywords=fix.KEYWORDS,
-                targeted_variations=fix.VARIATION_BAD_2
-            )
-        assert str(e.value) == 'Variations of \'{}\' could ' \
-            'not be validated'.format(fix.TITLE_GOOD)
-
-    def test_targeted_variations_3_bookmark(self):
-        with pytest.raises(Exception) as e:
-            bookmark.Bookmark(
-                title=fix.TITLE_GOOD,
-                url=fix.URL_GOOD,
-                keywords=fix.KEYWORDS,
-                targeted_variations=fix.VARIATION_BAD_3
-            )
-        assert str(e.value).startswith('Variation Title')
-
-    def test_targeted_variations_4_bookmark(self):
-        with pytest.raises(Exception) as e:
-            bookmark.Bookmark(
-                title=fix.TITLE_GOOD,
-                url=fix.URL_GOOD,
-                keywords=fix.KEYWORDS,
-                targeted_variations=fix.VARIATION_BAD_4
-            )
-        assert str(e.value).startswith('Variation URL')
-
-    def test_targeted_variations_5_bookmark(self):
-        with pytest.raises(Exception) as e:
-            bookmark.Bookmark(
-                title=fix.TITLE_GOOD,
-                url=fix.URL_GOOD,
-                keywords=fix.KEYWORDS,
-                targeted_variations=fix.VARIATION_BAD_5
-            )
-        assert str(e.value).startswith('Variation Device')
+        assert str(e.value).startswith(response)
 
     def test_id_bookmark(self):
         with pytest.raises(Exception) as e:
