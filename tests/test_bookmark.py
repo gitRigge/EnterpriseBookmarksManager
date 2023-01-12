@@ -26,19 +26,21 @@
 # ---------------------------------------------------------------------------
 
 import datetime as dt
+import json
 
 import pytest
 import pytz
 
 import src.ebm.bookmark as bookmark
+import tests.ebm_fixtures as fix
 
 
 class TestBookmark(object):
 
     def test_basic_bookmark(self):
-        my_title = 'Basic Bookmark'
-        my_url = 'http://www.dummybasicurl.com'
-        my_keywords = 'test'
+        my_title = fix.TITLE_GOOD
+        my_url = fix.URL_GOOD
+        my_keywords = fix.KEYWORDS
         bm = bookmark.Bookmark(
             title=my_title,
             url=my_url,
@@ -47,59 +49,134 @@ class TestBookmark(object):
         assert isinstance(bm, bookmark.Bookmark)
         assert bm.title == my_title
         assert bm.url == my_url
-        assert bm.keywords == [my_keywords]
+        assert bm.keywords == my_keywords.split(';')
 
     def test_full_bookmark(self):
-        test_start_date = dt.datetime.utcnow().replace(tzinfo=pytz.UTC)
-        test_end_date = dt.datetime.utcnow().replace(tzinfo=pytz.UTC) + \
-            dt.timedelta(days=1)
-        last_modified = dt.datetime.utcnow().replace(tzinfo=pytz.UTC) - \
-            dt.timedelta(days=1)
+        test_start_date = fix.TEST_START_DATE
+        test_end_date = fix.TEST_END_DATE
+        last_modified = fix.TEST_LAST_MOD
         bm = bookmark.Bookmark(
-            title='Full Bookmark',
-            url='http://www.dummyfullurl.com',
-            keywords='test1;test2',
-            match_similar_keywords='true',
-            state='published',
-            description='Basic Bookmark Description',
-            reserved_keywords='rtest1;rtest2',
-            categories='Basic Category',
+            title=fix.TITLE_GOOD,
+            url=fix.URL_GOOD,
+            keywords=fix.KEYWORDS,
+            match_similar_keywords=fix.MATCH_SIMILAR_KEYWORDS_GOOD,
+            state=fix.STATE_GOOD,
+            description=fix.DESCRIPTION,
+            reserved_keywords=fix.RESERVED_KEYWORDS_GOOD,
+            categories=fix.CATEGORIES,
             start_date=test_start_date,
             end_date=test_end_date,
-            country_region='de;us',
-            use_aad_location='False',
-            groups='d0dc8935-5cfb-47ae-bb41-3b362e6fee97;'
-            'd4f274a5-3f82-4165-a60d-f122a87dcdc3',
-            device_and_os='pc-windows;pc-mac',
-            targeted_variations='[{"description":"Italian Description",'
-            '"country":"it"}]',
+            country_region=fix.COUNTRY_GOOD,
+            use_aad_location=fix.USE_AAD_LOCATION_GOOD,
+            groups=fix.GROUPS_GOOD,
+            device_and_os=fix.DEVICE_AND_OS_GOOD,
+            targeted_variations=fix.VARIATION_GOOD,
             last_modified=last_modified,
-            last_modified_by='user123',
-            id='20a830b1-0729-4d97-9dfb-f9f7d93acccd'
+            last_modified_by=fix.LAST_MODIFIED_BY,
+            id=fix.ID_GOOD
         )
         assert isinstance(bm, bookmark.Bookmark)
 
 
 class TestBookmarkHelpers(object):
 
-    def test_get_instance_bookmark(self):
+    def test_get_instance_1_bookmark(self):
+        test_start_date = fix.TEST_START_DATE
+        test_end_date = fix.TEST_END_DATE
+        last_modified = fix.TEST_LAST_MOD
         bm = bookmark.Bookmark(
-            title='Basic Bookmark',
-            url='http://www.dummybasicurl.com',
-            keywords='test'
+            title=fix.TITLE_GOOD,
+            url=fix.URL_GOOD,
+            keywords=fix.KEYWORDS,
+            match_similar_keywords=fix.MATCH_SIMILAR_KEYWORDS_GOOD,
+            state=fix.STATE_GOOD,
+            description=fix.DESCRIPTION,
+            reserved_keywords=fix.RESERVED_KEYWORDS_GOOD,
+            categories=fix.CATEGORIES,
+            start_date=test_start_date,
+            end_date=test_end_date,
+            country_region=fix.COUNTRY_GOOD,
+            use_aad_location=fix.USE_AAD_LOCATION_GOOD,
+            groups=fix.GROUPS_GOOD,
+            device_and_os=fix.DEVICE_AND_OS_GOOD,
+            targeted_variations=fix.VARIATION_GOOD,
+            last_modified=last_modified,
+            last_modified_by=fix.LAST_MODIFIED_BY,
+            id=fix.ID_GOOD
         )
         bm_list = bm.to_string()
         bm_columns = bm.get_columns()
         assert len(bm_list) == len(bm_columns)
+        assert bm_list[0] == fix.TITLE_GOOD
+        assert bm_list[1] == fix.URL_GOOD
+        assert bm_list[2] == fix.KEYWORDS
+        assert bm_list[3] == fix.MATCH_SIMILAR_KEYWORDS_GOOD
+        assert bm_list[4] == fix.STATE_GOOD
+        assert bm_list[5] == fix.DESCRIPTION
+        assert bm_list[6] == fix.RESERVED_KEYWORDS_GOOD
+        assert bm_list[7] == fix.CATEGORIES.lower()
+        assert bm_list[8] == test_start_date.strftime('%Y-%m-%dT%H:%M:%S+00')
+        assert bm_list[9] == test_end_date.strftime('%Y-%m-%dT%H:%M:%S+00')
+        assert bm_list[10] == fix.COUNTRY_GOOD
+        assert bm_list[11] == fix.USE_AAD_LOCATION_GOOD
+        assert bm_list[12] == fix.GROUPS_GOOD
+        assert bm_list[13] == fix.DEVICE_AND_OS_GOOD
+        assert bm_list[14] == json.loads(fix.VARIATION_GOOD.replace('""', '"'))
+        assert bm_list[15] == last_modified.strftime('%m/%d/%Y')
+        assert bm_list[16] == fix.LAST_MODIFIED_BY
+        assert bm_list[17] == fix.ID_GOOD
+
+    def test_get_instance_2_bookmark(self):
+        bm = bookmark.Bookmark(
+            title=fix.TITLE_GOOD,
+            url=fix.URL_GOOD,
+            keywords=fix.KEYWORDS,
+            description=None,
+            reserved_keywords=None,
+            categories=None,
+            start_date=None,
+            end_date=None,
+            country_region=None,
+            groups=None,
+            device_and_os=None,
+            targeted_variations=None,
+            last_modified=None,
+            last_modified_by=None,
+            id=None
+        )
+        bm_list = bm.to_string()
+        assert bm_list[5] == ''
+        assert bm_list[6] == ''
+        assert bm_list[7] == ''
+        assert bm_list[8] == ''
+        assert bm_list[9] == ''
+        assert bm_list[10] == ''
+        assert bm_list[12] == ''
+        assert bm_list[13] == ''
+        assert bm_list[14] == ''
+        assert bm_list[15] == ''
+        assert bm_list[16] == ''
+        assert bm_list[17] == ''
 
 
 class TestBookmarkValidation(object):
 
+    def test_long_title_bookmark(self):
+        my_title = fix.TITLE_BAD
+        my_url = fix.URL_GOOD
+        my_keywords = fix.KEYWORDS
+        bm = bookmark.Bookmark(
+            title=my_title,
+            url=my_url,
+            keywords=my_keywords
+        )
+        assert len(bm.title) == 60
+
     def test_missing_url_bookmark(self):
         with pytest.raises(Exception) as e:
             bookmark.Bookmark(
-                title='Basic Bookmark',
-                keywords='test'
+                title=fix.TITLE_GOOD,
+                keywords=fix.KEYWORDS
             )
         assert str(e.value).endswith(
             '__init__() missing 1 required positional argument: \'url\'')
@@ -107,8 +184,8 @@ class TestBookmarkValidation(object):
     def test_missing_keyword_bookmark(self):
         with pytest.raises(Exception) as e:
             bookmark.Bookmark(
-                title='Basic Bookmark',
-                url='http://www.dummyurl.com'
+                title=fix.TITLE_GOOD,
+                url=fix.URL_GOOD
             )
         assert str(e.value).endswith(
             '__init__() missing 1 required positional argument: \'keywords\'')
@@ -116,88 +193,97 @@ class TestBookmarkValidation(object):
     def test_valid_match_bookmark(self):
         with pytest.raises(Exception) as e:
             bookmark.Bookmark(
-                title='Basic Bookmark',
-                url='http://www.dummyurl.com',
-                keywords='test',
-                match_similar_keywords='True'
+                title=fix.TITLE_GOOD,
+                url=fix.URL_GOOD,
+                keywords=fix.KEYWORDS,
+                match_similar_keywords=fix.MATCH_SIMILAR_KEYWORDS_BAD
             )
-        assert str(e.value) == 'Match similar keywords value of \'Basic ' \
-            'Bookmark\' could not be validated'
+        assert str(e.value) == 'Match similar keywords value of \'{}' \
+            '\' could not be validated'.format(fix.TITLE_GOOD)
 
     def test_valid_state_bookmark(self):
         with pytest.raises(Exception) as e:
             bookmark.Bookmark(
-                title='Basic Bookmark',
-                url='http://www.dummyurl.com',
-                keywords='test',
-                state='Published'
+                title=fix.TITLE_GOOD,
+                url=fix.URL_GOOD,
+                keywords=fix.KEYWORDS,
+                state=fix.STATE_BAD
             )
-        assert str(e.value) == 'State of \'Basic Bookmark\' could ' \
-            'not be validated'
+        assert str(e.value) == 'State of \'{}\' could ' \
+            'not be validated'.format(fix.TITLE_GOOD)
 
     def test_reservered_keywords_bookmark(self):
         with pytest.raises(Exception) as e:
             bookmark.Bookmark(
-                title='Basic Bookmark',
-                url='http://www.dummyurl.com',
-                keywords='test',
-                reserved_keywords='test'
+                title=fix.TITLE_GOOD,
+                url=fix.URL_GOOD,
+                keywords=fix.KEYWORDS,
+                reserved_keywords=fix.RESERVED_KEYWORDS_BAD
             )
-        assert str(e.value) == 'Keywords/Reserved Keywords of \'Basic ' \
-            'Bookmark\' could not be validated'
+        assert str(e.value) == 'Keywords/Reserved Keywords of \'{}' \
+            '\' could not be validated'.format(fix.TITLE_GOOD)
 
     def test_country_region_bookmark(self):
         with pytest.raises(Exception) as e:
             bookmark.Bookmark(
-                title='Basic Bookmark',
-                url='http://www.dummyurl.com',
-                keywords='test',
-                country_region='aa'
+                title=fix.TITLE_GOOD,
+                url=fix.URL_GOOD,
+                keywords=fix.KEYWORDS,
+                country_region=fix.COUNTRY_BAD
             )
-        assert str(e.value) == 'Country/Region of \'Basic Bookmark\' could '\
-            'not be validated'
+        assert str(e.value) == 'Country/Region of \'{}\' could '\
+            'not be validated'.format(fix.TITLE_GOOD)
 
     def test_aad_location_bookmark(self):
         with pytest.raises(Exception) as e:
             bookmark.Bookmark(
-                title='Basic Bookmark',
-                url='http://www.dummyurl.com',
-                keywords='test',
-                use_aad_location='false'
+                title=fix.TITLE_GOOD,
+                url=fix.URL_GOOD,
+                keywords=fix.KEYWORDS,
+                use_aad_location=fix.USE_AAD_LOCATION_BAD
             )
-        assert str(e.value) == 'Use AAD Location of \'Basic Bookmark\' could '\
-            'not be validated'
+        assert str(e.value) == 'Use AAD Location of \'{}\' could '\
+            'not be validated'.format(fix.TITLE_GOOD)
 
     def test_groups_bookmark(self):
         with pytest.raises(Exception) as e:
             bookmark.Bookmark(
-                title='Basic Bookmark',
-                url='http://www.dummyurl.com',
-                keywords='test',
-                groups='d0dc8935-5cfb-47ae-bb41-3b362e6fee9'
+                title=fix.TITLE_GOOD,
+                url=fix.URL_GOOD,
+                keywords=fix.KEYWORDS,
+                groups=fix.GROUPS_BAD
             )
-        assert str(e.value) == 'Groups of \'Basic Bookmark\' could ' \
-            'not be validated'
+        assert str(e.value) == 'Groups of \'{}\' could ' \
+            'not be validated'.format(fix.TITLE_GOOD)
 
     def test_devices_and_os_bookmark(self):
         with pytest.raises(Exception) as e:
             bookmark.Bookmark(
-                title='Basic Bookmark',
-                url='http://www.dummyurl.com',
-                keywords='test',
-                device_and_os='pc'
+                title=fix.TITLE_GOOD,
+                url=fix.URL_GOOD,
+                keywords=fix.KEYWORDS,
+                device_and_os=fix.DEVICE_AND_OS_BAD
             )
-        assert str(e.value) == 'Device/OS of \'Basic Bookmark\' could ' \
-            'not be validated'
+        assert str(e.value) == 'Device/OS of \'{}\' could ' \
+            'not be validated'.format(fix.TITLE_GOOD)
+
+    def test_url_bookmark(self):
+        with pytest.raises(Exception) as e:
+            bookmark.Bookmark(
+                title=fix.TITLE_GOOD,
+                url=fix.URL_BAD,
+                keywords=fix.KEYWORDS
+            )
+        assert str(e.value) == 'URL of \'{}\' could ' \
+            'not be validated'.format(fix.TITLE_GOOD)
 
     def test_targeted_variations_1_bookmark(self):
         with pytest.raises(Exception) as e:
             bookmark.Bookmark(
-                title='Basic Bookmark',
-                url='http://www.dummyurl.com',
-                keywords='test',
-                targeted_variations='[{"description":"Italian Description", '
-                '"country":"aa"}]'
+                title=fix.TITLE_GOOD,
+                url=fix.URL_GOOD,
+                keywords=fix.KEYWORDS,
+                targeted_variations=fix.VARIATION_BAD_1
             )
         assert str(e.value) == 'Variation Country \'aa\' could ' \
             'not be validated'
@@ -205,37 +291,66 @@ class TestBookmarkValidation(object):
     def test_targeted_variations_2_bookmark(self):
         with pytest.raises(Exception) as e:
             bookmark.Bookmark(
-                title='Basic Bookmark',
-                url='http://www.dummyurl.com',
-                keywords='test',
-                targeted_variations='[{"test":"This node does not exist", '
-                '"country":"it"}]'
+                title=fix.TITLE_GOOD,
+                url=fix.URL_GOOD,
+                keywords=fix.KEYWORDS,
+                targeted_variations=fix.VARIATION_BAD_2
             )
-        assert str(e.value) == 'Variations of \'Basic Bookmark\' could ' \
-            'not be validated'
+        assert str(e.value) == 'Variations of \'{}\' could ' \
+            'not be validated'.format(fix.TITLE_GOOD)
+
+    def test_targeted_variations_3_bookmark(self):
+        with pytest.raises(Exception) as e:
+            bookmark.Bookmark(
+                title=fix.TITLE_GOOD,
+                url=fix.URL_GOOD,
+                keywords=fix.KEYWORDS,
+                targeted_variations=fix.VARIATION_BAD_3
+            )
+        assert str(e.value).startswith('Variation Title')
+
+    def test_targeted_variations_4_bookmark(self):
+        with pytest.raises(Exception) as e:
+            bookmark.Bookmark(
+                title=fix.TITLE_GOOD,
+                url=fix.URL_GOOD,
+                keywords=fix.KEYWORDS,
+                targeted_variations=fix.VARIATION_BAD_4
+            )
+        assert str(e.value).startswith('Variation URL')
+
+    def test_targeted_variations_5_bookmark(self):
+        with pytest.raises(Exception) as e:
+            bookmark.Bookmark(
+                title=fix.TITLE_GOOD,
+                url=fix.URL_GOOD,
+                keywords=fix.KEYWORDS,
+                targeted_variations=fix.VARIATION_BAD_5
+            )
+        assert str(e.value).startswith('Variation Device')
 
     def test_id_bookmark(self):
         with pytest.raises(Exception) as e:
             bookmark.Bookmark(
-                title='Basic Bookmark',
-                url='http://www.dummyurl.com',
-                keywords='test',
-                id='20a830b1-0729-4d97-9dfb-f9f7d93accc'
+                title=fix.TITLE_GOOD,
+                url=fix.URL_GOOD,
+                keywords=fix.KEYWORDS,
+                id=fix.ID_BAD
             )
-        assert str(e.value) == 'ID of \'Basic Bookmark\' could ' \
-            'not be validated'
+        assert str(e.value) == 'ID of \'{}\' could ' \
+            'not be validated'.format(fix.TITLE_GOOD)
 
     def test_state_vs_start_date_bookmark(self):
         with pytest.raises(Exception) as e:
             bookmark.Bookmark(
-                title='Basic Bookmark',
-                url='http://www.dummyurl.com',
-                keywords='test',
+                title=fix.TITLE_GOOD,
+                url=fix.URL_GOOD,
+                keywords=fix.KEYWORDS,
                 state='scheduled',
                 start_date=None
             )
-        assert str(e.value) == 'State/End Date of \'Basic Bookmark\' could ' \
-            'not be validated'
+        assert str(e.value) == 'State/End Date of \'{}\' could ' \
+            'not be validated'.format(fix.TITLE_GOOD)
 
     def test_start_date_vs_end_date_bookmark(self):
         test_start_date = dt.datetime.utcnow().replace(tzinfo=pytz.UTC)
@@ -243,24 +358,24 @@ class TestBookmarkValidation(object):
             dt.timedelta(days=1)
         with pytest.raises(Exception) as e:
             bookmark.Bookmark(
-                title='Basic Bookmark',
-                url='http://www.dummyurl.com',
-                keywords='test',
+                title=fix.TITLE_GOOD,
+                url=fix.URL_GOOD,
+                keywords=fix.KEYWORDS,
                 start_date=test_start_date,
                 end_date=test_end_date
             )
-        assert str(e.value) == 'Start Date/End Date of \'Basic ' \
-            'Bookmark\' could not be validated'
+        assert str(e.value) == 'Start Date/End Date of \'{}' \
+            '\' could not be validated'.format(fix.TITLE_GOOD)
 
     def test_outdated_end_date_bookmark(self):
         test_end_date = dt.datetime.utcnow().replace(tzinfo=pytz.UTC) - \
             dt.timedelta(days=1)
         with pytest.raises(Exception) as e:
             bookmark.Bookmark(
-                title='Basic Bookmark',
-                url='http://www.dummyurl.com',
-                keywords='test',
+                title=fix.TITLE_GOOD,
+                url=fix.URL_GOOD,
+                keywords=fix.KEYWORDS,
                 end_date=test_end_date
             )
-        assert str(e.value) == 'Start Date/End Date of \'Basic ' \
-            'Bookmark\' could not be validated'
+        assert str(e.value) == 'Start Date/End Date of \'{}' \
+            '\' could not be validated'.format(fix.TITLE_GOOD)

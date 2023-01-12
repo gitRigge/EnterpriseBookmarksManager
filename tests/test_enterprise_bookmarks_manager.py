@@ -23,9 +23,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 #
-# Revision history:
-# 2022-12-20  Created
-#
 # ---------------------------------------------------------------------------
 
 import argparse

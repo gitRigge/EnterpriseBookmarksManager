@@ -216,8 +216,6 @@ class Bookmark(object):
     def to_string(self):
         if self.match_similar_keywords:
             match_similar_keywords = 'true'
-        else:
-            match_similar_keywords = 'false'
         if self.description is None:
             description = ''
         else:
@@ -233,17 +231,11 @@ class Bookmark(object):
         if self.start_date is None:
             start_date = ''
         else:
-            try:
-                start_date = self.start_date.strftime('%Y-%m-%dT%H:%M:%S+00')
-            except Exception:
-                start_date = self.start_date
+            start_date = self.start_date.strftime('%Y-%m-%dT%H:%M:%S+00')
         if self.end_date is None:
             end_date = ''
         else:
-            try:
-                end_date = self.end_date.strftime('%Y-%m-%dT%H:%M:%S+00')
-            except Exception:
-                end_date = self.end_date
+            end_date = self.end_date.strftime('%Y-%m-%dT%H:%M:%S+00')
         if self.country_region is None:
             country_region = ''
         else:

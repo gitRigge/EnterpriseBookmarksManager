@@ -32,49 +32,14 @@ import openpyxl
 import pytest
 
 import src.ebm.bm2xls as bm2xls
-
-FILENAME = 'testfile'
-HEADER_GOOD = 'Title,Url,Keywords,Match Similar Keywords,'\
-    'State,Description,Reserved Keywords,Categories,'\
-    'Start Date,End Date,Country/Region,Use AAD Location,'\
-    'Groups,Device & OS,Targeted Variations,Last Modified,'\
-    'Last Modified By,Id'
-HEADER_BAD = 'Title,Url,Keywords,Match Similar Keywords,'\
-    'State,Description,Reserved Keywords,Categories,'\
-    'Start Date,End Date,Country/Region,Use AAD Location,'\
-    'Groups,Device & OS,Targeted Variations,Last Modified,Id'
-TITLE = 'Test'
-URL = 'http://test-rr.de'
-KEYWORDS = 'test;testrr;test_rr'
-MATCH_SIMILAR_KEYWORDS = 'true'
-STATE = 'published'
-DESCRIPTION = 'Das ist nur ein Test von Roland'
-END_DATE = '2022-12-29T07:30:00+00'
-USE_AAD_LOCATION = 'False'
-LAST_MODIFIED = '12/28/2022'
-LAST_MODIFIED_BY = 'usr@test.com'
-ID = 'dd8901da-7f6d-4c54-9251-a11a0ee48d52'
-CSV_FILE = '{0}\n{1},{2},{3},{4},{5},{6},,,,{7},,{8},,,,{9},{10},{11}'.format(
-        HEADER_GOOD,
-        TITLE,
-        URL,
-        KEYWORDS,
-        MATCH_SIMILAR_KEYWORDS,
-        STATE,
-        DESCRIPTION,
-        END_DATE,
-        USE_AAD_LOCATION,
-        LAST_MODIFIED,
-        LAST_MODIFIED_BY,
-        ID
-    )
+import tests.ebm_fixtures as fix
 
 
 @pytest.fixture(scope='session')
 def input_filename(tmpdir_factory):
-    fn = tmpdir_factory.mktemp('data').join('{}.csv'.format(FILENAME))
+    fn = tmpdir_factory.mktemp('data').join('{}.csv'.format(fix.FILENAME))
     f = open(fn, 'w')
-    f.write(CSV_FILE)
+    f.write(fix.CSV_FILE_GOOD)
     f.close()
     return str(fn)
 
@@ -83,25 +48,25 @@ class TestBm2xlxReadInput(object):
 
     def test_read_input(self, input_filename):
         retval = bm2xls.read_input_file(input_filename)
-        assert ID in retval
-        assert retval[ID]['A'] == TITLE
-        assert retval[ID]['B'] == URL
-        assert retval[ID]['C'] == KEYWORDS
-        assert retval[ID]['D'] == MATCH_SIMILAR_KEYWORDS
-        assert retval[ID]['E'] == STATE
-        assert retval[ID]['F'] == DESCRIPTION
-        assert retval[ID]['J'] == END_DATE
-        assert retval[ID]['L'] == USE_AAD_LOCATION
-        assert retval[ID]['P'] == LAST_MODIFIED
-        assert retval[ID]['Q'] == LAST_MODIFIED_BY
+        assert fix.ID_GOOD in retval
+        assert retval[fix.ID_GOOD]['A'] == fix.TITLE_GOOD
+        assert retval[fix.ID_GOOD]['B'] == fix.URL_GOOD
+        assert retval[fix.ID_GOOD]['C'] == fix.KEYWORDS
+        assert retval[fix.ID_GOOD]['D'] == fix.MATCH_SIMILAR_KEYWORDS_GOOD
+        assert retval[fix.ID_GOOD]['E'] == fix.STATE_GOOD
+        assert retval[fix.ID_GOOD]['F'] == fix.DESCRIPTION
+        assert retval[fix.ID_GOOD]['J'] == fix.END_DATE
+        assert retval[fix.ID_GOOD]['L'] == fix.USE_AAD_LOCATION_GOOD
+        assert retval[fix.ID_GOOD]['P'] == fix.LAST_MODIFIED
+        assert retval[fix.ID_GOOD]['Q'] == fix.LAST_MODIFIED_BY
 
     def test_validate_header_good(self):
-        header_row = HEADER_GOOD.split(',')
+        header_row = fix.HEADER_GOOD.split(',')
         retval = bm2xls.validate_header(header_row)
         assert retval is True
 
     def test_validate_header_bad(self):
-        header_row = HEADER_BAD.split(',')
+        header_row = fix.HEADER_BAD.split(',')
         retval = bm2xls.validate_header(header_row)
         assert retval is False
 
@@ -111,29 +76,30 @@ class TestBm2xlxWriteXlsx(object):
     def test_convert_csv_to_excel(self, input_filename):
         filename = input_filename.split('.csv')[0]
         output = bm2xls.convert_csv_to_excel(filename)
-        assert output.endswith('{}.xlsx'.format(FILENAME))
+        assert output.endswith('{}.xlsx'.format(fix.FILENAME))
         wb = openpyxl.load_workbook(output)
         ws = wb.active
-        assert ws['{}{}'.format('A', 2)].value == TITLE
-        assert ws['{}{}'.format('B', 2)].value == URL
-        assert ws['{}{}'.format('C', 2)].value == KEYWORDS
-        assert ws['{}{}'.format('D', 2)].value == MATCH_SIMILAR_KEYWORDS
-        assert ws['{}{}'.format('E', 2)].value == STATE
-        assert ws['{}{}'.format('F', 2)].value == DESCRIPTION
-        assert ws['{}{}'.format('L', 2)].value == USE_AAD_LOCATION
+        assert ws['{}{}'.format('A', 2)].value == fix.TITLE_GOOD
+        assert ws['{}{}'.format('B', 2)].value == fix.URL_GOOD
+        assert ws['{}{}'.format('C', 2)].value == fix.KEYWORDS
+        _ms = fix.MATCH_SIMILAR_KEYWORDS_GOOD
+        assert ws['{}{}'.format('D', 2)].value == _ms
+        assert ws['{}{}'.format('E', 2)].value == fix.STATE_GOOD
+        assert ws['{}{}'.format('F', 2)].value == fix.DESCRIPTION
+        assert ws['{}{}'.format('L', 2)].value == fix.USE_AAD_LOCATION_GOOD
         my_last_modified = ws['{}{}'.format('P', 2)].value
-        assert my_last_modified.strftime('%m/%d/%Y') == LAST_MODIFIED
-        assert ws['{}{}'.format('Q', 2)].value == LAST_MODIFIED_BY
+        assert my_last_modified.strftime('%m/%d/%Y') == fix.LAST_MODIFIED
+        assert ws['{}{}'.format('Q', 2)].value == fix.LAST_MODIFIED_BY
 
 
 class TestBm2xlxDates(object):
 
     def test_last_modified_date(self):
-        my_date = bm2xls.get_date_by_str(LAST_MODIFIED)
+        my_date = bm2xls.get_date_by_str(fix.LAST_MODIFIED)
         assert my_date == dt.datetime(2022, 12, 28, 0, 0)
 
     def test_start_end_date(self):
-        my_date = bm2xls.get_date_by_str(END_DATE)
+        my_date = bm2xls.get_date_by_str(fix.END_DATE)
         assert my_date == dt.datetime(2022, 12, 29, 7, 30)
 
     def test_date_string(self):
@@ -149,25 +115,25 @@ class TestBm2xlxFormats(object):
 
     def test_last_modified_format_de(self):
         locale.setlocale(locale.LC_ALL, 'de_DE')
-        my_format = bm2xls.get_date_format_by_str(LAST_MODIFIED)
+        my_format = bm2xls.get_date_format_by_str(fix.LAST_MODIFIED)
         locale.setlocale(locale.LC_ALL, '')
         assert my_format == 'dd.mm.yyyy'
 
     def _last_modified_format_en(self):
         locale.setlocale(locale.LC_ALL, 'en_US')
-        my_format = bm2xls.get_date_format_by_str(LAST_MODIFIED)
+        my_format = bm2xls.get_date_format_by_str(fix.LAST_MODIFIED)
         locale.setlocale(locale.LC_ALL, '')
         assert my_format == 'mm/dd/yyyy'
 
     def test_start_end_format_de(self):
         locale.setlocale(locale.LC_ALL, 'de_AT')
-        my_format = bm2xls.get_date_format_by_str(END_DATE)
+        my_format = bm2xls.get_date_format_by_str(fix.END_DATE)
         locale.setlocale(locale.LC_ALL, '')
         assert my_format == 'dd.mm.yyyy HH:MM:SS'
 
     def test_start_end_format_en(self):
         locale.setlocale(locale.LC_ALL, 'en_GB')
-        my_format = bm2xls.get_date_format_by_str(END_DATE)
+        my_format = bm2xls.get_date_format_by_str(fix.END_DATE)
         locale.setlocale(locale.LC_ALL, '')
         assert my_format == 'mm/dd/yyyy HH:MM:SS'
 
