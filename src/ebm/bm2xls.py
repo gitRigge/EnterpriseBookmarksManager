@@ -125,7 +125,6 @@ def convert_csv_to_excel(filename: str):
                     cell_char, cell_number)].font = openpyxl.styles.Font(
                         bold=True)
             elif cell_char in ['I', 'J', 'P']:  # Detect datetime objects
-                print('HELLO')
                 my_date = get_date_by_str(
                     my_input_data[bookmark_id][cell_char])
                 ws['{}{}'.format(cell_char, cell_number)] = my_date
