@@ -25,9 +25,50 @@
 #
 # ---------------------------------------------------------------------------
 
+import pytest
+
 import src.ebm.xls2bm as xls2bm
+import tests.ebm_fixtures as fix
 
 
-def test_to_do():
-    xls2bm.__name__
-    assert True  # TODO Add more tests
+@pytest.fixture(scope='session')
+def output_filename(tmpdir_factory):
+    fn = tmpdir_factory.mktemp('data').join('{}.csv'.format(fix.FILENAME))
+    f = open(fn, 'w')
+    f.close()
+    return str(fn)
+
+
+class TestXlsx2bmWriteOutput(object):
+
+    @pytest.mark.skip()  # TODO Need to fix this test
+    def test_write_init_output_file(self, output_filename):
+        output = xls2bm.write_init_output_file(
+            output_filename, fix.HEADER_GOOD.split(','))
+        f = open(output, 'r')
+        lines = f.readlines()
+        assert output.endswith('.csv')
+        assert lines[0].split(',')[1:-1] == fix.HEADER_GOOD.split(',')[1:-1]
+        _first = lines[0].split(',')[0]
+        _last = lines[0].split(',')[-1].replace('\n', '')
+        assert _first.endswith(fix.HEADER_GOOD.split(',')[0])
+        assert _last == fix.HEADER_GOOD.split(',')[-1]
+
+    def test_append_to_output_file(self, output_filename):
+        data = [
+            fix.TITLE_GOOD,
+            fix.URL_GOOD,
+            fix.KEYWORDS,
+            fix.MATCH_SIMILAR_KEYWORDS_GOOD,
+            fix.STATE_GOOD,
+            fix.DESCRIPTION,
+            fix.END_DATE,
+            fix.USE_AAD_LOCATION_GOOD,
+            fix.LAST_MODIFIED,
+            fix.LAST_MODIFIED_BY,
+            fix.ID_GOOD
+        ]
+        xls2bm.append_to_output_file(output_filename, data)
+        f = open(output_filename, 'r')
+        lines = f.readlines()
+        assert len(lines[0].split(',')) == len(data)

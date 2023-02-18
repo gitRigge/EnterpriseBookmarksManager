@@ -25,44 +25,78 @@
 #
 # ---------------------------------------------------------------------------
 
-import argparse
-import datetime as dt
-import os
 from unittest.mock import patch
 
-import pytz
+import pytest
 
 import src.ebm.enterprise_bookmarks_manager as ebm
-
-TEST_START_DATE = dt.datetime.utcnow().replace(tzinfo=pytz.UTC)
-TEST_END_DATE = dt.datetime.utcnow().replace(tzinfo=pytz.UTC) + dt.timedelta(
-    days=1)
-LAST_MODIFIED = dt.datetime.utcnow().replace(tzinfo=pytz.UTC) - dt.timedelta(
-    days=1)
-VARIATION = '[{"description":"Italian Description","country":"it"}]'
-BM_FIXTURE = "{}Title,Url,Keywords,Match Similar Keywords,State,Description," \
-    "Reserved Keywords,Categories,Start Date,End Date,Country/Region," \
-    "Use AAD Location,Groups,Device & OS,Targeted Variations,Last Modified," \
-    "Last Modified By,Id\n" \
-    "Full Bookmark,http://www.dummyfullurl.com,test1;test2," \
-    "true,published,Basic Bookmark Description,rtest1;rtest2,Basic Category," \
-    "{},{},de;us,False,d0dc8935-5cfb-47ae-bb41-3b362e6fee97;" \
-    "d4f274a5-3f82-4165-a60d-f122a87dcdc3,pc-windows;pc-mac,{},{}," \
-    "user123,20a830b1-0729-4d97-9dfb-f9f7d93acccd".format(
-        u'\uFEFF',
-        TEST_START_DATE.strftime('%Y-%m-%dT%H:%M:%S+00'),
-        TEST_END_DATE.strftime('%Y-%m-%dT%H:%M:%S+00'),
-        VARIATION,
-        LAST_MODIFIED.strftime('%m/%d/%Y')
-    )
+import tests.ebm_fixtures as fix
 
 
-@patch('bookmark.Bookmark')
-def _import_csv_cli(monkeypatch):  # TODO Not yet working...
-    file = open('test.csv', 'w', encoding='utf-8')
-    file.write(BM_FIXTURE)
-    file.close()
-    parser = argparse.ArgumentParser()
-    parser.inputfile = 'test.csv'
-    ebm.run_from_command_line(parser)
-    os.remove('test.csv')
+@pytest.fixture(scope='session')
+def input_filename(tmpdir_factory):
+    fn = tmpdir_factory.mktemp('data').join('{}.csv'.format(fix.FILENAME))
+    f = open(fn, 'w')
+    f.write(fix.CSV_FILE_GOOD)
+    f.close()
+    return str(fn)
+
+
+class TestEbmMain(object):
+
+    @pytest.mark.skip()  # TODO Need to fix this test
+    def test_main_1(self, capsys):
+        try:
+            ebm.main([])
+        except SystemExit:
+            pass
+        output = capsys.readouterr().out
+        assert str(output).startswith('usage: pytest [-h]')
+
+    @pytest.mark.parametrize('arg', ('-h', '--help'))
+    @pytest.mark.skip()  # TODO Need to fix this test
+    def test_main_2(self, capsys, arg):
+        try:
+            ebm.main([arg])
+        except SystemExit:
+            pass
+        output = capsys.readouterr().out
+        assert str(output).startswith('usage: pytest.EXE [-h]')
+
+    @pytest.mark.parametrize('file', ('sample.csv', 'sample.xlsx'))
+    def test_main_3(self, capsys, file):
+        try:
+            ebm.main([file])
+        except SystemExit:
+            pass
+        output = capsys.readouterr().out
+        assert str(output).startswith('[Errno 2] No such file or directory')
+
+    @patch('sys.argv')
+    @pytest.mark.parametrize('inputfile', ('sample.csv', 'sample.xlsx'))
+    def test_run_from_command_line_1(self, argv_mock, inputfile, capsys):
+        argv_mock.inputfile = inputfile
+        try:
+            ebm.run_from_command_line(argv_mock)
+        except SystemExit:
+            pass
+        output = capsys.readouterr().out
+        assert str(output).startswith('[Errno 2] No such file or directory')
+
+    # @patch('sys.argv')
+    # @patch('src.ebm.enterprise_bookmarks_manager.input')
+    # @patch('src.ebm.utils.get_most_possible_file')
+    # @pytest.mark.parametrize('input', (
+    #   ['yes', 'sample.csv'], ['yes', 'sample.xlsx'], ['yes', 'sample.txt']))
+    # @pytest.mark.skip()  # TODO Need to fix this test
+    # def test_run_from_command_line_2(self, argv_mock, i_mock, c_mock,
+    #   input, capsys):
+    #     i_mock = input[0]
+    #     c_mock = input[1]
+    #     argv_mock.inputfile = None
+    #     try:
+    #         ebm.run_from_command_line(argv_mock)
+    #     except OSError:
+    #         pass
+    #     output = capsys.readouterr().out
+    #     assert str(output).startswith('[Errno 2] No such file or directory')

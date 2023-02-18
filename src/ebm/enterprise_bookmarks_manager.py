@@ -26,6 +26,7 @@
 # Revision history:
 # 2022-12-20  Created
 # 2022-12-29  Updated
+# 2023-01-1x  Updated
 #
 # ---------------------------------------------------------------------------
 
@@ -75,10 +76,14 @@ def run_from_command_line(args):
     print('Output file: {}'.format(output))
 
 
-if __name__ == "__main__":
+def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument(
         'inputfile', nargs='?', action='store', type=str,
         help='Specify input file to read (Excel or CSV)')
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     run_from_command_line(args)
+
+
+if __name__ == "__main__":
+    main()

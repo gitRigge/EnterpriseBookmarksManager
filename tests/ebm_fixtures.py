@@ -29,7 +29,6 @@ import datetime as dt
 
 import pytz
 
-
 FILENAME = 'testfile'
 
 HEADER_GOOD = 'Title,Url,Keywords,Match Similar Keywords,'\

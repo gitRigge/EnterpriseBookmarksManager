@@ -59,31 +59,35 @@ def append_to_output_file(outputfile: str, data: list):
 
 def read_input_file(filename: str):
     retval = bookmark_shelf.BookmarkShelf()
-    wb = openpyxl.load_workbook('{}.xlsx'.format(filename))
-    ws = wb.active
-    for r in range(2, ws.max_row+1):
-        my_bookmark = bookmark.Bookmark(
-            title=ws['{}{}'.format('A', r)].value,
-            url=ws['{}{}'.format('B', r)].value,
-            keywords=ws['{}{}'.format('C', r)].value,
-            match_similar_keywords=ws['{}{}'.format('D', r)].value,
-            state=ws['{}{}'.format('E', r)].value,
-            description=ws['{}{}'.format('F', r)].value,
-            reserved_keywords=ws['{}{}'.format('G', r)].value,
-            categories=ws['{}{}'.format('H', r)].value,
-            start_date=ws['{}{}'.format('I', r)].value,
-            end_date=ws['{}{}'.format('J', r)].value,
-            country_region=ws['{}{}'.format('K', r)].value,
-            use_aad_location=ws['{}{}'.format('L', r)].value,
-            groups=ws['{}{}'.format('M', r)].value,
-            device_and_os=ws['{}{}'.format('N', r)].value,
-            targeted_variations=ws['{}{}'.format('O', r)].value,
-            last_modified=ws['{}{}'.format('P', r)].value,
-            last_modified_by=ws['{}{}'.format('Q', r)].value,
-            id=ws['{}{}'.format('R', r)].value
-        )
-        retval.add_bookmark(my_bookmark)
-    return retval
+    try:
+        wb = openpyxl.load_workbook('{}.xlsx'.format(filename))
+        ws = wb.active
+        for r in range(2, ws.max_row+1):
+            my_bookmark = bookmark.Bookmark(
+                title=ws['{}{}'.format('A', r)].value,
+                url=ws['{}{}'.format('B', r)].value,
+                keywords=ws['{}{}'.format('C', r)].value,
+                match_similar_keywords=ws['{}{}'.format('D', r)].value,
+                state=ws['{}{}'.format('E', r)].value,
+                description=ws['{}{}'.format('F', r)].value,
+                reserved_keywords=ws['{}{}'.format('G', r)].value,
+                categories=ws['{}{}'.format('H', r)].value,
+                start_date=ws['{}{}'.format('I', r)].value,
+                end_date=ws['{}{}'.format('J', r)].value,
+                country_region=ws['{}{}'.format('K', r)].value,
+                use_aad_location=ws['{}{}'.format('L', r)].value,
+                groups=ws['{}{}'.format('M', r)].value,
+                device_and_os=ws['{}{}'.format('N', r)].value,
+                targeted_variations=ws['{}{}'.format('O', r)].value,
+                last_modified=ws['{}{}'.format('P', r)].value,
+                last_modified_by=ws['{}{}'.format('Q', r)].value,
+                id=ws['{}{}'.format('R', r)].value
+            )
+            retval.add_bookmark(my_bookmark)
+        return retval
+    except FileNotFoundError as e:
+        print(e)
+        sys.exit(2)
 
 
 def convert_excel_to_csv(filename: str):
@@ -116,11 +120,3 @@ def convert_excel_to_csv(filename: str):
                 append_to_output_file(my_output_filename, my_bm.to_string())
                 counter += 1
     return ', '.join(retval)
-
-
-filename = ''
-if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        filename = sys.argv[1].split('.xlsx')[0]
-        output = convert_excel_to_csv(filename)
-        print('Output file: {}'.format(output))
