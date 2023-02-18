@@ -28,6 +28,7 @@
 import csv
 import datetime as dt
 import locale
+import sys
 
 import openpyxl
 
@@ -40,30 +41,36 @@ def read_input_file(input_filename: str):
     my_output_columns = bookmark.Bookmark.get_columns()
     header_row_keys = list(my_output_columns.keys())
     header_checked = False
-    with open(input_filename, newline='', encoding='utf-8') as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
-        for row in csv_reader:
-            if not header_checked:
-                if validate_header(row):
-                    header_checked = True
-                else:
-                    raise ValidationError(
-                        'Header of CSV file not correct')
-            t = {}
-            id = row[-1]
-            for col in range(0, len(row)):
-                t[header_row_keys[col]] = row[col]
-            retval[id] = t
-    return retval
+    try:
+        with open(input_filename, newline='', encoding='utf-8') as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=',')
+            for row in csv_reader:
+                if not header_checked:
+                    if validate_header(row):
+                        header_checked = True
+                    else:
+                        raise ValidationError(
+                            'Header of CSV file not correct')
+                t = {}
+                id = row[-1]
+                for col in range(0, len(row)):
+                    t[header_row_keys[col]] = row[col]
+                retval[id] = t
+        return retval
+    except FileNotFoundError as e:
+        print(e)
+        sys.exit(2)
 
 
 def validate_header(header_row: list):
     my_output_columns = bookmark.Bookmark.get_columns()
     header_row_values = list(my_output_columns.values())
-    if header_row_values == header_row:
-        return True
-    else:
-        return False
+    counter = 0
+    for header in header_row:
+        if not header_row[counter].endswith(header_row_values[counter]):
+            return False
+        counter += 1
+    return True
 
 
 def get_date_by_str(datetimestr: str):
