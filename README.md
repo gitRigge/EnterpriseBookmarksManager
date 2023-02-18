@@ -33,3 +33,11 @@ Just run the app to use the interactive mode:
 Or open a command line and call the app with an argument:
 
 ```enterprise_bookmarks_manager.exe Bookmarks_from_Admin_Center.csv```
+
+This will result in the Excel file 'Bookmarks_from_Admin_Center.xlsx'
+
+Or call the app like this:
+
+```enterprise_bookmarks_manager.exe Bookmarks_from_Admin_Center.xlsx```
+
+This will result in the CSV file 'Bookmarks_from_Admin_Center.csv' which you then can import in the Admin Center.
