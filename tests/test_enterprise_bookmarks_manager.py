@@ -63,19 +63,23 @@ class TestEbmMain(object):
         output = capsys.readouterr().out
         assert str(output).startswith('usage: pytest.EXE [-h]')
 
-    @pytest.mark.parametrize('file', ('sample.csv', 'sample.xlsx'))
-    def test_main_3(self, capsys, file):
+    @pytest.mark.parametrize('arg', ('-i sample.csv', '-i sample.xlsx'))
+    def test_main_3(self, capsys, arg):
         try:
-            ebm.main([file])
+            ebm.main([arg])
         except SystemExit:
             pass
         output = capsys.readouterr().out
         assert str(output).startswith('[Errno 2] No such file or directory')
 
     @patch('sys.argv')
-    @pytest.mark.parametrize('inputfile', ('sample.csv', 'sample.xlsx'))
-    def test_run_from_command_line_1(self, argv_mock, inputfile, capsys):
-        argv_mock.inputfile = inputfile
+    @pytest.mark.parametrize('arg', ('-i sample.csv', '-i sample.xlsx'))
+    def test_run_from_command_line_1(self, argv_mock, arg, capsys):
+        argv_mock.inputfile = arg
+        argv_mock.countries = False
+        argv_mock.variation = False
+        argv_mock.devices = False
+        argv_mock.status = False
         try:
             ebm.run_from_command_line(argv_mock)
         except SystemExit:

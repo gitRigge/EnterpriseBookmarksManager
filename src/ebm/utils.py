@@ -29,6 +29,8 @@ import glob
 import os
 from os.path import exists
 
+import src.ebm.enums as enums
+
 
 def get_save_filename(suggested_filename: str):
     retval = ''
@@ -56,3 +58,23 @@ def get_most_possible_file():
         files_grabbed.extend(glob.glob(files))
     retval = max(files_grabbed, key=os.path.getctime)
     return retval
+
+
+def print_devices():
+    print('Allowed Devices are:')
+    print(', '.join(list(enums.Enums().devices.values())))
+
+
+def print_status():
+    print('Allowed Status are:')
+    print(', '.join(list(enums.Enums().status.values())))
+
+
+def print_countries():
+    print('Allowed Country Codes are:')
+    print(', '.join(list(enums.Enums().countries.keys())))
+
+
+def print_variations():
+    print('Sample Variation:')
+    print('[{},{{...}}]'.format(enums.Enums().variations))

@@ -26,7 +26,7 @@
 # Revision history:
 # 2022-12-20  Created
 # 2022-12-29  Updated
-# 2023-01-1x  Updated
+# 2023-02-20  Extended
 #
 # ---------------------------------------------------------------------------
 
@@ -39,12 +39,24 @@ import src.ebm.xls2bm as xls2bm
 
 __author__ = 'Roland Rickborn'
 __copyright__ = 'Copyright (c) 2023 {}'.format(__author__)
-__version__ = '2.0'
+__version__ = '2.1'
 __url__ = 'https://github.com/gitRigge/EnterpriseBookmarksManager'
 __license__ = 'MIT License (MIT)'
 
 
 def run_from_command_line(args):
+    if args.countries:
+        utils.print_countries()
+        sys.exit(0)
+    if args.variation:
+        utils.print_variations()
+        sys.exit(0)
+    if args.devices:
+        utils.print_devices()
+        sys.exit(0)
+    if args.status:
+        utils.print_status()
+        sys.exit(0)
     if args.inputfile is None:
         candidate = utils.get_most_possible_file()
         user_input = input(
@@ -66,7 +78,7 @@ def run_from_command_line(args):
                 output = bm2xls.convert_csv_to_excel(filename)
             else:
                 print('Wrong file format - exit')
-                sys.exit(0)
+                sys.exit(13)
     elif args.inputfile.endswith('.xlsx'):
         filename = '{}'.format(args.inputfile).split('.')[0]
         output = xls2bm.convert_excel_to_csv(filename)
@@ -77,10 +89,28 @@ def run_from_command_line(args):
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description='Manage SharePoint Enterprise Bookmarks',
+        epilog='''For more help, see:
+        https://github.com/gitRigge/EnterpriseBookmarksManager''')
     parser.add_argument(
-        'inputfile', nargs='?', action='store', type=str,
+        '-i', '--inputfile', action='store', type=str,
         help='Specify input file to read (Excel or CSV)')
+    parser.add_argument(
+        '-c', '--countries', action='store_true',
+        help='Show list of ISO country codes')
+    parser.add_argument(
+        '-v', '--variation', action='store_true',
+        help='Show sample variation JSON')
+    parser.add_argument(
+        '-d', '--devices', action='store_true',
+        help='Show list of devices')
+    parser.add_argument(
+        '-s', '--status', action='store_true',
+        help='Show list of status')
+    parser.add_argument(
+        '--version', action='version',
+        version='version: {}'.format(__version__))
     args = parser.parse_args(argv)
     run_from_command_line(args)
 
