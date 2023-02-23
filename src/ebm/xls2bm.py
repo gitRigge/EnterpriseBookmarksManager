@@ -31,9 +31,14 @@ import sys
 
 import openpyxl
 
-import src.ebm.bookmark as bookmark
-import src.ebm.bookmark_shelf as bookmark_shelf
-import src.ebm.utils as utils
+try:
+    import src.ebm.bookmark as bookmark
+    import src.ebm.bookmark_shelf as bookmark_shelf
+    import src.ebm.utils as utils
+except ModuleNotFoundError:
+    import bookmark
+    import bookmark_shelf
+    import utils
 
 
 def write_init_output_file(outputFilename: str, outputColumns: list):

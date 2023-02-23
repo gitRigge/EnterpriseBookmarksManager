@@ -33,9 +33,14 @@
 import argparse
 import sys
 
-import src.ebm.bm2xls as bm2xls
-import src.ebm.utils as utils
-import src.ebm.xls2bm as xls2bm
+try:
+    import src.ebm.bm2xls as bm2xls
+    import src.ebm.utils as utils
+    import src.ebm.xls2bm as xls2bm
+except ModuleNotFoundError:
+    import bm2xls
+    import utils
+    import xls2bm
 
 __author__ = 'Roland Rickborn'
 __copyright__ = 'Copyright (c) 2023 {}'.format(__author__)
@@ -59,26 +64,31 @@ def run_from_command_line(args):
         sys.exit(0)
     if args.inputfile is None:
         candidate = utils.get_most_possible_file()
-        user_input = input(
-            'Do you want to continue with \'{}\' (yes/no): '.format(candidate))
-        if user_input.lower() == 'yes' or user_input.lower() == 'y':
-            if candidate.endswith('.xlsx'):
-                filename = '{}'.format(candidate).split('.')[0]
-                output = xls2bm.convert_excel_to_csv(filename)
+        if candidate != '':
+            user_input = input(
+                'Do you want to continue with \'{}\' (yes/no): '.format(
+                    candidate))
+            if user_input.lower() == 'yes' or user_input.lower() == 'y':
+                if candidate.endswith('.xlsx'):
+                    filename = '{}'.format(candidate).split('.')[0]
+                    output = xls2bm.convert_excel_to_csv(filename)
+                else:
+                    filename = '{}'.format(candidate).split('.')[0]
+                    output = bm2xls.convert_csv_to_excel(filename)
             else:
-                filename = '{}'.format(candidate).split('.')[0]
-                output = bm2xls.convert_csv_to_excel(filename)
+                user_input = input('Enter the filename to read: ')
+                if user_input.endswith('.xlsx'):
+                    filename = '{}'.format(user_input).split('.')[0]
+                    output = xls2bm.convert_excel_to_csv(filename)
+                elif user_input.endswith('.csv'):
+                    filename = '{}'.format(user_input).split('.')[0]
+                    output = bm2xls.convert_csv_to_excel(filename)
+                else:
+                    print('Wrong file format - exit')
+                    sys.exit(13)
         else:
-            user_input = input('Enter the filename to read: ')
-            if user_input.endswith('.xlsx'):
-                filename = '{}'.format(user_input).split('.')[0]
-                output = xls2bm.convert_excel_to_csv(filename)
-            elif user_input.endswith('.csv'):
-                filename = '{}'.format(user_input).split('.')[0]
-                output = bm2xls.convert_csv_to_excel(filename)
-            else:
-                print('Wrong file format - exit')
-                sys.exit(13)
+            print('Run \'enterprise_bookmarks_manager --help\' to get help')
+            sys.exit(0)
     elif args.inputfile.endswith('.xlsx'):
         filename = '{}'.format(args.inputfile).split('.')[0]
         output = xls2bm.convert_excel_to_csv(filename)
@@ -98,16 +108,16 @@ def main(argv=None):
         help='Specify input file to read (Excel or CSV)')
     parser.add_argument(
         '-c', '--countries', action='store_true',
-        help='Show list of ISO country codes')
+        help='Show list of ISO country codes and exit')
     parser.add_argument(
         '-v', '--variation', action='store_true',
-        help='Show sample variation JSON')
+        help='Show sample variation JSON and exit')
     parser.add_argument(
         '-d', '--devices', action='store_true',
-        help='Show list of devices')
+        help='Show list of devices and exit')
     parser.add_argument(
         '-s', '--status', action='store_true',
-        help='Show list of status')
+        help='Show list of status and exit')
     parser.add_argument(
         '--version', action='version',
         version='version: {}'.format(__version__))

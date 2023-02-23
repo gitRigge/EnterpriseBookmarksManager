@@ -73,7 +73,7 @@ class TestEbmMain(object):
         assert str(output).startswith('[Errno 2] No such file or directory')
 
     @patch('sys.argv')
-    @pytest.mark.parametrize('arg', ('-i sample.csv', '-i sample.xlsx'))
+    @pytest.mark.parametrize('arg', ('sample.csv', 'sample.xlsx'))
     def test_run_from_command_line_1(self, argv_mock, arg, capsys):
         argv_mock.inputfile = arg
         argv_mock.countries = False

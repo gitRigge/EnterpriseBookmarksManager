@@ -29,7 +29,10 @@ import glob
 import os
 from os.path import exists
 
-import src.ebm.enums as enums
+try:
+    import src.ebm.enums as enums
+except ModuleNotFoundError:
+    import enums
 
 
 def get_save_filename(suggested_filename: str):
@@ -56,7 +59,8 @@ def get_most_possible_file():
     files_grabbed = []
     for files in types:
         files_grabbed.extend(glob.glob(files))
-    retval = max(files_grabbed, key=os.path.getctime)
+    if files_grabbed != []:
+        retval = max(files_grabbed, key=os.path.getctime)
     return retval
 
 

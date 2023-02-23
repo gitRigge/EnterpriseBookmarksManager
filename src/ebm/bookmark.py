@@ -31,7 +31,10 @@ import json
 import pytz
 import validators
 
-import src.ebm.enums as enums
+try:
+    import src.ebm.enums as enums
+except ModuleNotFoundError:
+    import enums
 
 
 class Bookmark(object):

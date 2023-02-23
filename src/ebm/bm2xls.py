@@ -32,8 +32,12 @@ import sys
 
 import openpyxl
 
-import src.ebm.bookmark as bookmark
-import src.ebm.utils as utils
+try:
+    import src.ebm.bookmark as bookmark
+    import src.ebm.utils as utils
+except ModuleNotFoundError:
+    import bookmark
+    import utils
 
 
 def read_input_file(input_filename: str):
