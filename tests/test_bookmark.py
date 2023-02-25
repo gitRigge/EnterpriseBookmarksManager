@@ -365,7 +365,8 @@ class TestBookmarkValidation(object):
         (fix.VARIATION_BAD_3, 'Variation Title'),
         (fix.VARIATION_BAD_4, 'Variation URL'),
         (fix.VARIATION_BAD_5, 'Variation Device'),
-        (fix.VARIATION_BAD_6, 'Variation Description')])
+        (fix.VARIATION_BAD_6, 'Variation Description')
+        ])
     def test_targeted_variations_bookmark(self, variation, response):
         with pytest.raises(Exception) as e:
             bookmark.Bookmark(

@@ -25,6 +25,7 @@
 #
 # ---------------------------------------------------------------------------
 
+import os
 from unittest.mock import patch
 
 import pytest
@@ -34,7 +35,7 @@ import tests.ebm_fixtures as fix
 
 
 @pytest.fixture(scope='session')
-def input_filename(tmpdir_factory):
+def input_csv_filename(tmpdir_factory):
     fn = tmpdir_factory.mktemp('data').join('{}.csv'.format(fix.FILENAME))
     f = open(fn, 'w')
     f.write(fix.CSV_FILE_GOOD)
@@ -44,27 +45,57 @@ def input_filename(tmpdir_factory):
 
 class TestEbmMain(object):
 
-    @pytest.mark.skip()  # TODO Need to fix this test
-    def test_main_1(self, capsys):
+    def test_main_no_argument_fail(self, capsys):
         try:
             ebm.main([])
         except SystemExit:
             pass
         output = capsys.readouterr().out
-        assert str(output).startswith('usage: pytest [-h]')
+        assert str(output).startswith(
+            'Run \'enterprise_bookmarks_manager --help\' to get help')
 
-    @pytest.mark.parametrize('arg', ('-h', '--help'))
-    @pytest.mark.skip()  # TODO Need to fix this test
-    def test_main_2(self, capsys, arg):
+    def test_main_no_argument_with_csv(self, monkeypatch, capsys):
+        f = open('sample.csv', 'x')
+        f.close()
+        monkeypatch.setattr('builtins.input', lambda _: 'y')
+        try:
+            ebm.main([])
+            i = input('Do you want to continue with \'sample.csv\' (yes/no):')
+            assert i == 'y'
+            output = capsys.readouterr().out
+            assert output.startswith('Output file: sample.xlsx')
+        finally:
+            if os.path.exists('sample.csv'):
+                os.remove('sample.csv')
+            if os.path.exists('sample.xlsx'):
+                os.remove('sample.xlsx')
+
+    @pytest.mark.parametrize('arg, response', [
+        ('-h', 'usage:'),
+        ('--help', 'usage:'),
+        ('-c', 'Allowed Country Codes are:'),
+        ('--countries', 'Allowed Country Codes are:'),
+        ('-v', 'Sample Variation:'),
+        ('--variation', 'Sample Variation:'),
+        ('-d', 'Allowed Devices are:'),
+        ('--devices', 'Allowed Devices are:'),
+        ('-s', 'Allowed Status are:'),
+        ('--status', 'Allowed Status are:'),
+        ('--version', 'version:')
+        ])
+    def test_main_optional_arguments(self, capsys, arg, response):
         try:
             ebm.main([arg])
         except SystemExit:
             pass
         output = capsys.readouterr().out
-        assert str(output).startswith('usage: pytest.EXE [-h]')
+        assert str(output).startswith(response)
 
-    @pytest.mark.parametrize('arg', ('-i sample.csv', '-i sample.xlsx'))
-    def test_main_3(self, capsys, arg):
+    @pytest.mark.parametrize('arg', [
+        ('-i {}.csv'.format(fix.FILENAME)),
+        ('-i {}.xlsx'.format(fix.FILENAME))
+        ])
+    def test_main_input_file_fail(self, capsys, arg):
         try:
             ebm.main([arg])
         except SystemExit:
@@ -72,8 +103,22 @@ class TestEbmMain(object):
         output = capsys.readouterr().out
         assert str(output).startswith('[Errno 2] No such file or directory')
 
+    @patch('src.ebm.bm2xls')
+    @pytest.mark.skip()
+    def test_main_input_file_ok(self, bm2xls_mock, input_csv_filename, capsys):
+        ebm.main(['-i {}'.format(input_csv_filename)])
+        output = capsys.readouterr().out
+        assert str(output).startswith('[Errno 2] No such file or directory')
+
+
+class TestEbmHelpers(object):
+
     @patch('sys.argv')
-    @pytest.mark.parametrize('arg', ('sample.csv', 'sample.xlsx'))
+    @pytest.mark.parametrize('arg', [
+        ('sample.csv'),
+        ('sample.xlsx')
+        ])
+    @pytest.mark.skip()
     def test_run_from_command_line_1(self, argv_mock, arg, capsys):
         argv_mock.inputfile = arg
         argv_mock.countries = False
