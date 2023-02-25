@@ -51,12 +51,12 @@ class TestBm2xlxReadInput(object):
         assert fix.ID_GOOD in retval
         assert retval[fix.ID_GOOD]['A'] == fix.TITLE_GOOD
         assert retval[fix.ID_GOOD]['B'] == fix.URL_GOOD
-        assert retval[fix.ID_GOOD]['C'] == fix.KEYWORDS
+        assert retval[fix.ID_GOOD]['C'] == fix.KEYWORDS_GOOD
         assert retval[fix.ID_GOOD]['D'] == fix.MATCH_SIMILAR_KEYWORDS_GOOD
         assert retval[fix.ID_GOOD]['E'] == fix.STATE_GOOD
         assert retval[fix.ID_GOOD]['F'] == fix.DESCRIPTION
         assert retval[fix.ID_GOOD]['J'] == fix.END_DATE
-        assert retval[fix.ID_GOOD]['L'] == fix.USE_AAD_LOCATION_GOOD
+        assert retval[fix.ID_GOOD]['L'] == fix.USE_AAD_LOCATION_FALSE_GOOD
         assert retval[fix.ID_GOOD]['P'] == fix.LAST_MODIFIED
         assert retval[fix.ID_GOOD]['Q'] == fix.LAST_MODIFIED_BY
 
@@ -74,6 +74,7 @@ class TestBm2xlxReadInput(object):
 class TestBm2xlxWriteXlsx(object):
 
     def test_convert_csv_to_excel(self, input_filename):
+        _use_aad_location = fix.USE_AAD_LOCATION_FALSE_GOOD
         filename = input_filename.split('.csv')[0]
         output = bm2xls.convert_csv_to_excel(filename)
         assert output.endswith('{}.xlsx'.format(fix.FILENAME))
@@ -81,12 +82,12 @@ class TestBm2xlxWriteXlsx(object):
         ws = wb.active
         assert ws['{}{}'.format('A', 2)].value == fix.TITLE_GOOD
         assert ws['{}{}'.format('B', 2)].value == fix.URL_GOOD
-        assert ws['{}{}'.format('C', 2)].value == fix.KEYWORDS
+        assert ws['{}{}'.format('C', 2)].value == fix.KEYWORDS_GOOD
         _ms = fix.MATCH_SIMILAR_KEYWORDS_GOOD
         assert ws['{}{}'.format('D', 2)].value == _ms
         assert ws['{}{}'.format('E', 2)].value == fix.STATE_GOOD
         assert ws['{}{}'.format('F', 2)].value == fix.DESCRIPTION
-        assert ws['{}{}'.format('L', 2)].value == fix.USE_AAD_LOCATION_GOOD
+        assert ws['{}{}'.format('L', 2)].value == _use_aad_location
         my_last_modified = ws['{}{}'.format('P', 2)].value
         assert my_last_modified.strftime('%m/%d/%Y') == fix.LAST_MODIFIED
         assert ws['{}{}'.format('Q', 2)].value == fix.LAST_MODIFIED_BY

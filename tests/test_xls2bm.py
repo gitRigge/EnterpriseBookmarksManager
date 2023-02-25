@@ -58,12 +58,12 @@ class TestXlsx2bmWriteOutput(object):
         data = [
             fix.TITLE_GOOD,
             fix.URL_GOOD,
-            fix.KEYWORDS,
+            fix.KEYWORDS_GOOD,
             fix.MATCH_SIMILAR_KEYWORDS_GOOD,
             fix.STATE_GOOD,
             fix.DESCRIPTION,
             fix.END_DATE,
-            fix.USE_AAD_LOCATION_GOOD,
+            fix.USE_AAD_LOCATION_FALSE_GOOD,
             fix.LAST_MODIFIED,
             fix.LAST_MODIFIED_BY,
             fix.ID_GOOD

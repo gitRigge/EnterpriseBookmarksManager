@@ -262,10 +262,7 @@ class Bookmark(object):
         if self.last_modified is None:
             last_modified = ''
         else:
-            try:
-                last_modified = self.last_modified.strftime('%m/%d/%Y')
-            except Exception:
-                last_modified = self.last_modified
+            last_modified = self.last_modified.strftime('%m/%d/%Y')
         if self.last_modified_by is None:
             last_modified_by = ''
         else:
@@ -341,9 +338,12 @@ class Bookmark(object):
 
     @classmethod
     def validate_keywords(cls, keywords: list):
-        if len(keywords) != 0:
-            return True
-        return False
+        if len(keywords) == 0:
+            return False
+        for kw in keywords:
+            if len(kw) == 0 or kw == ';':
+                return False
+        return True
 
     @classmethod
     def valid_match_sim_kw(cls, msk: str):
@@ -467,7 +467,7 @@ class Bookmark(object):
         if rkeywords is not None:
             for kw in rkeywords:
                 if kw in keywords:
-                    return False
+                    return False  # TODO: Need to validate this!
             for kw in keywords:
                 if kw in rkeywords:
                     return False
