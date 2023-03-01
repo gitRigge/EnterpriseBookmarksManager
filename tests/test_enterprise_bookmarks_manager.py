@@ -95,7 +95,7 @@ class TestEbmMain(object):
 
     def test_main_no_argument_with_xlsx_1(self, monkeypatch, capsys):
         encoded = b''
-        for i in fix.TEST_XLSX_FILE:
+        for i in fix.TEST_XLSX_FILE_BIG:
             encoded = encoded + i
         with open('sample.xlsx', 'wb') as f:
             bytes = base64.b64decode(encoded)
@@ -106,16 +106,18 @@ class TestEbmMain(object):
             i = input('Do you want to continue with \'sample.xlsx\' (yes/no):')
             assert i == 'y'
             output = capsys.readouterr().out
-            assert output.startswith('Output file: sample.csv')
+            assert output.startswith('Output file: sample_1.csv')
         finally:
-            if os.path.exists('sample.csv'):
-                os.remove('sample.csv')
+            if os.path.exists('sample_1.csv'):
+                os.remove('sample_1.csv')
+            if os.path.exists('sample_2.csv'):
+                os.remove('sample_2.csv')
             if os.path.exists('sample.xlsx'):
                 os.remove('sample.xlsx')
 
     def test_main_no_argument_with_xlsx_2(self, monkeypatch, capsys):
         encoded = b''
-        for i in fix.TEST_XLSX_FILE:
+        for i in fix.TEST_XLSX_FILE_SMALL:
             encoded = encoded + i
         with open('sample1.xlsx', 'wb') as f:
             bytes = base64.b64decode(encoded)
