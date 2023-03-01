@@ -25,8 +25,8 @@
 #
 # ---------------------------------------------------------------------------
 
+import base64
 import os
-from unittest.mock import patch
 
 import pytest
 
@@ -54,7 +54,7 @@ class TestEbmMain(object):
         assert str(output).startswith(
             'Run \'enterprise_bookmarks_manager --help\' to get help')
 
-    def test_main_no_argument_with_csv(self, monkeypatch, capsys):
+    def test_main_no_argument_with_csv_1(self, monkeypatch, capsys):
         f = open('sample.csv', 'x')
         f.close()
         monkeypatch.setattr('builtins.input', lambda _: 'y')
@@ -69,6 +69,77 @@ class TestEbmMain(object):
                 os.remove('sample.csv')
             if os.path.exists('sample.xlsx'):
                 os.remove('sample.xlsx')
+
+    def test_main_no_argument_with_csv_2(self, monkeypatch, capsys):
+        f = open('sample1.csv', 'x')
+        f.close()
+        f = open('sample2.csv', 'x')
+        f.close()
+        monkeypatch.setattr('builtins.input', lambda _: 'n')
+        monkeypatch.setattr('builtins.input', lambda _: 'sample1.csv')
+        try:
+            ebm.main([])
+            i = input('Do you want to continue with \'sample2.csv\' (yes/no):')
+            assert i == 'sample1.csv'
+            output = capsys.readouterr().out
+            assert output.startswith('Output file: sample1.xlsx')
+        finally:
+            if os.path.exists('sample1.csv'):
+                os.remove('sample1.csv')
+            if os.path.exists('sample1.xlsx'):
+                os.remove('sample1.xlsx')
+            if os.path.exists('sample2.csv'):
+                os.remove('sample2.csv')
+            if os.path.exists('sample2.xlsx'):
+                os.remove('sample2.xlsx')
+
+    def test_main_no_argument_with_xlsx_1(self, monkeypatch, capsys):
+        encoded = b''
+        for i in fix.TEST_XLSX_FILE:
+            encoded = encoded + i
+        with open('sample.xlsx', 'wb') as f:
+            bytes = base64.b64decode(encoded)
+            f.write(bytes)
+        monkeypatch.setattr('builtins.input', lambda _: 'y')
+        try:
+            ebm.main([])
+            i = input('Do you want to continue with \'sample.xlsx\' (yes/no):')
+            assert i == 'y'
+            output = capsys.readouterr().out
+            assert output.startswith('Output file: sample.csv')
+        finally:
+            if os.path.exists('sample.csv'):
+                os.remove('sample.csv')
+            if os.path.exists('sample.xlsx'):
+                os.remove('sample.xlsx')
+
+    def test_main_no_argument_with_xlsx_2(self, monkeypatch, capsys):
+        encoded = b''
+        for i in fix.TEST_XLSX_FILE:
+            encoded = encoded + i
+        with open('sample1.xlsx', 'wb') as f:
+            bytes = base64.b64decode(encoded)
+            f.write(bytes)
+        with open('sample2.xlsx', 'wb') as f:
+            bytes = base64.b64decode(encoded)
+            f.write(bytes)
+        monkeypatch.setattr('builtins.input', lambda _: 'n')
+        monkeypatch.setattr('builtins.input', lambda _: 'sample1.xlsx')
+        try:
+            ebm.main([])
+            i = input("Do you want to continue with 'sample1.xlsx' (yes/no):")
+            assert i == 'sample1.xlsx'
+            output = capsys.readouterr().out
+            assert output.startswith('Output file: sample1.csv')
+        finally:
+            if os.path.exists('sample1.csv'):
+                os.remove('sample1.csv')
+            if os.path.exists('sample1.xlsx'):
+                os.remove('sample1.xlsx')
+            if os.path.exists('sample2.csv'):
+                os.remove('sample2.csv')
+            if os.path.exists('sample2.xlsx'):
+                os.remove('sample2.xlsx')
 
     @pytest.mark.parametrize('arg, response', [
         ('-h', 'usage:'),
@@ -102,50 +173,3 @@ class TestEbmMain(object):
             pass
         output = capsys.readouterr().out
         assert str(output).startswith('[Errno 2] No such file or directory')
-
-    @patch('src.ebm.bm2xls')
-    @pytest.mark.skip()
-    def test_main_input_file_ok(self, bm2xls_mock, input_csv_filename, capsys):
-        ebm.main(['-i {}'.format(input_csv_filename)])
-        output = capsys.readouterr().out
-        assert str(output).startswith('[Errno 2] No such file or directory')
-
-
-class TestEbmHelpers(object):
-
-    @patch('sys.argv')
-    @pytest.mark.parametrize('arg', [
-        ('sample.csv'),
-        ('sample.xlsx')
-        ])
-    @pytest.mark.skip()
-    def test_run_from_command_line_1(self, argv_mock, arg, capsys):
-        argv_mock.inputfile = arg
-        argv_mock.countries = False
-        argv_mock.variation = False
-        argv_mock.devices = False
-        argv_mock.status = False
-        try:
-            ebm.run_from_command_line(argv_mock)
-        except SystemExit:
-            pass
-        output = capsys.readouterr().out
-        assert str(output).startswith('[Errno 2] No such file or directory')
-
-    # @patch('sys.argv')
-    # @patch('src.ebm.enterprise_bookmarks_manager.input')
-    # @patch('src.ebm.utils.get_most_possible_file')
-    # @pytest.mark.parametrize('input', (
-    #   ['yes', 'sample.csv'], ['yes', 'sample.xlsx'], ['yes', 'sample.txt']))
-    # @pytest.mark.skip()  # TODO Need to fix this test
-    # def test_run_from_command_line_2(self, argv_mock, i_mock, c_mock,
-    #   input, capsys):
-    #     i_mock = input[0]
-    #     c_mock = input[1]
-    #     argv_mock.inputfile = None
-    #     try:
-    #         ebm.run_from_command_line(argv_mock)
-    #     except OSError:
-    #         pass
-    #     output = capsys.readouterr().out
-    #     assert str(output).startswith('[Errno 2] No such file or directory')
