@@ -30,6 +30,7 @@ import json
 
 import pytz
 import validators
+import urllib.parse
 
 try:
     import src.ebm.enums as enums
@@ -219,6 +220,8 @@ class Bookmark(object):
     def to_string(self):
         if self.match_similar_keywords:
             match_similar_keywords = 'true'
+        else:
+            match_similar_keywords = ''
         if self.description is None:
             description = ''
         else:
@@ -303,7 +306,12 @@ class Bookmark(object):
     @classmethod
     def get_serialized_variations(cls, variations):
         if variations is not None:
-            return json.loads(variations.replace('""', '"'))
+            try:
+                return json.loads(
+                    # variations.replace('""', '"'))
+                    variations)
+            except json.decoder.JSONDecodeError:
+                print(variations)
         else:
             return None
 
@@ -332,18 +340,22 @@ class Bookmark(object):
 
     @classmethod
     def validate_url(cls, url):
-        if url is not None and validators.url(url):
+        if url is not None and validators.url(
+                urllib.parse.quote(url, safe=':/%')):
             return True
         return False
 
     @classmethod
     def validate_keywords(cls, keywords: list):
-        if len(keywords) == 0:
-            return False
-        for kw in keywords:
-            if len(kw) == 0 or kw == ';':
+        if keywords is not None:
+            if len(keywords) == 0:
                 return False
-        return True
+            for kw in keywords:
+                if len(kw) == 0 or kw == ';':
+                    return False
+            return True
+        else:
+            return False
 
     @classmethod
     def valid_match_sim_kw(cls, msk: str):
