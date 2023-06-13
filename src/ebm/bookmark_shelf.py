@@ -57,8 +57,7 @@ class BookmarkShelf(object):
                     raise ValidationError(
                         'The reserved keyword \'{}\' exists already'.format(
                             kw))
-                else:
-                    self.reserved_keywords = self.reserved_keywords + rkeywords
+            self.reserved_keywords = self.reserved_keywords + rkeywords
 
     def validate_reserved_keywords(self, rkeywords: list):
         if rkeywords is not None:
