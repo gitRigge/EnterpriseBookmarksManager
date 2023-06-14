@@ -3,6 +3,7 @@
 ![Tests](https://github.com/gitRigge/EnterpriseBookmarksManager/actions/workflows/tests.yml/badge.svg)
 ![Coverage](https://raw.githubusercontent.com/gitRigge/EnterpriseBookmarksManager/main/coverage/coverage.svg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Code style: Flake8](https://img.shields.io/badge/code%20style-flake8-000000.svg)](https://github.com/pycqa/flake8)
 
 This app is able to convert Microsoft 365 Admin Center Enterprise Bookmarks CSV export to Excel and vice versa.
 
