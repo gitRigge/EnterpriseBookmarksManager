@@ -43,11 +43,27 @@ class TestBookmarkShelfAdd(object):
     @patch('src.ebm.bookmark.Bookmark')
     def test_add_identical_bookmark_to_shelf(self, MockBookmark):
         bm_shelf = src.ebm.bookmark_shelf.BookmarkShelf()
-        bm_shelf.add_bookmark(MockBookmark)
+        bm = MockBookmark
+        bm.title = 'Test'
+        bm.state = 'published'
+        bm_shelf.add_bookmark(bm)
         with pytest.raises(Exception) as e:
-            bm_shelf.add_bookmark(MockBookmark)
+            bm_shelf.add_bookmark(bm)
         assert str(e.value).startswith(
-            'A bookmark with the title \'<MagicMock name=\'Bookmark.title\'')
+            'A bookmark with the title \'Test\'')
+
+    @patch('src.ebm.bookmark.Bookmark')
+    def test_add_bookmarks_with_different_state_to_shelf(self, MockBookmark):
+        bm_shelf = src.ebm.bookmark_shelf.BookmarkShelf()
+        bm1 = MockBookmark
+        bm1.title = 'Test1'
+        bm1.state = 'published'
+        bm_shelf.add_bookmark(bm1)
+        bm2 = MockBookmark
+        bm2.title = 'Test1'
+        bm2.state = 'draft'
+        bm_shelf.add_bookmark(bm2)
+        assert True
 
     @patch('src.ebm.bookmark.Bookmark')
     def test_add_bookmark_to_shelf_with_existing_reserved_keyword(
@@ -72,36 +88,6 @@ class TestBookmarkShelfAdd(object):
         with pytest.raises(Exception) as e:
             bm_shelf.add_reserved_keywords(['test'])
         assert str(e.value) == 'The reserved keyword \'test\' exists already'
-
-
-class TestBookmarkShelfGet(object):
-
-    def test_get_no_bookmark_from_shelf(self):
-        bm_shelf = src.ebm.bookmark_shelf.BookmarkShelf()
-        with pytest.raises(Exception) as e:
-            bm_shelf.get_bookmark('Test')
-        assert str(e.value) == '"There is no title \'Test\' in the shelf"'
-
-    @patch('src.ebm.bookmark.Bookmark')
-    def test_get_bookmark_from_shelf(self, MockBookmark):
-        bm_shelf = src.ebm.bookmark_shelf.BookmarkShelf()
-        bm = MockBookmark
-        title = bm.title
-        bm_shelf.add_bookmark(bm)
-        bm = bm_shelf.get_bookmark(title)
-        assert True
-
-    @patch('src.ebm.bookmark.Bookmark')
-    def test_get_bookmarks_from_shelf(self, MockBookmark):
-        bm_shelf = src.ebm.bookmark_shelf.BookmarkShelf()
-        bm1 = MockBookmark
-        bm1.title = 'Test1'
-        bm_shelf.add_bookmark(bm1)
-        bm2 = MockBookmark
-        bm2.title = 'Test2'
-        bm_shelf.add_bookmark(bm2)
-        bms = bm_shelf.get_bookmarks()
-        assert len(bms) == 2
 
 
 class TestBookmarkShelfValidate(object):

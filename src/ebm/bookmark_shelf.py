@@ -25,6 +25,8 @@
 #
 # ---------------------------------------------------------------------------
 
+import uuid
+
 try:
     import src.ebm.bookmark as bookmark
 except ModuleNotFoundError:
@@ -43,12 +45,12 @@ class BookmarkShelf(object):
             self.keywords = self.keywords + bm.keywords
         if self.validate_reserved_keywords(bm.reserved_keywords):
             self.add_reserved_keywords(bm.reserved_keywords)
-        if bm.title in self.shelf.keys():
+        if self.validate_title_with_state(bm.title, bm.state):
+            self.shelf[str(uuid.uuid4())] = bm
+        else:
             raise ValidationError(
                 'A bookmark with the title \'{}\' exists already'.format(
                     bm.title))
-        else:
-            self.shelf[bm.title] = bm
 
     def add_reserved_keywords(self, rkeywords: list):
         if rkeywords is not None:
@@ -58,6 +60,17 @@ class BookmarkShelf(object):
                         'The reserved keyword \'{}\' exists already'.format(
                             kw))
             self.reserved_keywords = self.reserved_keywords + rkeywords
+
+    def validate_title_with_state(self, title: str, state: str):
+        bms = self.get_bookmarks()
+        for id in bms:
+            bm = bms[id]
+            mytitle = bm.title
+            mystate = bm.state
+            if (title == mytitle and
+                    state in ['published', 'scheduled'] and state == mystate):
+                return False
+        return True
 
     def validate_reserved_keywords(self, rkeywords: list):
         if rkeywords is not None:
@@ -77,12 +90,8 @@ class BookmarkShelf(object):
                             kw))
         return True
 
-    def get_bookmark(self, title: str):
-        if title not in self.shelf.keys():
-            raise KeyError(
-                'There is no title \'{}\' in the shelf'.format(title))
-        else:
-            return self.shelf[title]
+    def get_bookmark(self, key: str):
+        return self.shelf[key]
 
     def get_bookmarks(self):
         return self.shelf
