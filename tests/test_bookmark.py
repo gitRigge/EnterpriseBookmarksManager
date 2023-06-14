@@ -129,6 +129,18 @@ class TestBookmark(object):
             )
         assert str(e.value).startswith('Last Modified Date of \'Test\'')
 
+    def test_invalid_url_bookmark(self):
+        my_title = fix.TITLE_GOOD
+        my_url = fix.ALIAS_BAD
+        my_keywords = fix.KEYWORDS_GOOD
+        with pytest.raises(bookmark.ValidationError) as e:
+            bookmark.Bookmark(
+                title=my_title,
+                url=my_url,
+                keywords=my_keywords
+            )
+        assert str(e.value) == 'URL of \'Test\' could not be validated'
+
 
 class TestBookmarkHelpers(object):
 
@@ -348,15 +360,18 @@ class TestBookmarkValidation(object):
         assert str(e.value) == 'Device/OS of \'{}\' could ' \
             'not be validated'.format(fix.TITLE_GOOD)
 
-    def test_url_bookmark(self):
+    @pytest.mark.parametrize('url, response', [
+        (fix.URL_BAD, 'URL of \'Test\' could not be validated'),
+        (fix.ALIAS_BAD, 'URL of \'Test\' could not be validated')
+        ])
+    def test_url_bookmark(self, url, response):
         with pytest.raises(Exception) as e:
             bookmark.Bookmark(
                 title=fix.TITLE_GOOD,
-                url=fix.URL_BAD,
+                url=url,
                 keywords=fix.KEYWORDS_GOOD
             )
-        assert str(e.value) == 'URL of \'{}\' could ' \
-            'not be validated'.format(fix.TITLE_GOOD)
+        assert str(e.value).startswith(response)
 
     @pytest.mark.parametrize('variation, response', [
         (fix.VARIATION_BAD_1, 'Variation Country \'{}\''.format(

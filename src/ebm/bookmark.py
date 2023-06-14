@@ -27,10 +27,11 @@
 
 import datetime
 import json
+import re
+import urllib.parse
 
 import pytz
 import validators
-import urllib.parse
 
 try:
     import src.ebm.enums as enums
@@ -340,10 +341,21 @@ class Bookmark(object):
 
     @classmethod
     def validate_url(cls, url):
-        if url is not None and validators.url(
-                urllib.parse.quote(url, safe=':/%')):
+        myurl = urllib.parse.quote(url, safe=':/%')
+        if url is not None and (
+                validators.url(myurl) or cls.validate_alias_url(myurl)):
             return True
         return False
+
+    @classmethod
+    def validate_alias_url(cls, url):
+        u = urllib.parse.urlparse(url)
+        alias = '{}://{}'.format(u.scheme, u.hostname)
+        alias_pattern = re.compile(r'^http[s]?:\/\/[\w|-]{3,}\/?$', re.I)
+        if alias_pattern.match(alias):
+            return True
+        else:
+            return False
 
     @classmethod
     def validate_keywords(cls, keywords: list):
