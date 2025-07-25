@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 #
-# Copyright (c) 2023, Roland Rickborn (r_2@gmx.net)
+# Copyright (c) 2025, Roland Rickborn (r_2@gmx.net)
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -80,5 +80,16 @@ def print_countries():
 
 
 def print_variations():
-    print('Sample Variation:')
+    print('Template Variation:')
     print('[{},{{...}}]'.format(enums.Enums().variations))
+    print('\nThe usage of \'title\', \'url\', \'description\', ' +
+          'and \'device\' is optional.')
+    print('\nExample:')
+    print('[{"title": "My German Title", "url": "www.example.de", ' +
+          '"description": "My German Description", "country": "de"}, ' +
+          '{"title": "My French Title", "url": "www.example.fr", ' +
+          '"description": "My French Description", "country": "fr"}]')
+
+
+def print_license(license):
+    print('License Information: ' + license)

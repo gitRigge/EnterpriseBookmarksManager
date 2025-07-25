@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 #
-# Copyright (c) 2023, Roland Rickborn (r_2@gmx.net)
+# Copyright (c) 2025, Roland Rickborn (r_2@gmx.net)
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,6 @@ import json
 import re
 import urllib.parse
 
-import pytz
 import validators
 
 try:
@@ -472,7 +471,7 @@ class Bookmark(object):
     @classmethod
     def validate_start_end_dates(cls, sdate, edate):
         if isinstance(edate, datetime.date):
-            if edate < datetime.datetime.utcnow().replace(tzinfo=pytz.UTC):
+            if edate < datetime.datetime.now().replace(tzinfo=datetime.UTC):
                 return False
         if isinstance(sdate, datetime.date) and isinstance(
                 edate, datetime.date):

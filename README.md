@@ -42,3 +42,15 @@ Or call the app like this:
 ```enterprise_bookmarks_manager.exe Bookmarks_from_Admin_Center.xlsx```
 
 This will result in the CSV file 'Bookmarks_from_Admin_Center.csv' which you then can import in the Admin Center.
+
+
+### Development
+
+Run this command to install all requirements. I'd like to recommend to run it in a virtual environment:
+
+`pip install -r requirements.txt`
+
+
+Then run this command to clean and test everything:
+
+`tox`

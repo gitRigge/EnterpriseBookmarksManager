@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 #
-# Copyright (c) 2023, Roland Rickborn (r_2@gmx.net)
+# Copyright (c) 2025, Roland Rickborn (r_2@gmx.net)
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -26,8 +26,6 @@
 # ---------------------------------------------------------------------------
 
 import datetime as dt
-
-import pytz
 
 FILENAME = 'testfile'
 
@@ -141,10 +139,10 @@ CSV_FILE_BAD = '{}\n{},{},{},{},{},{},,,,{},,{},,,,{},{},{}'.format(
         ID_GOOD
     )
 
-TEST_START_DATE = dt.datetime.utcnow().replace(tzinfo=pytz.UTC)
-TEST_END_DATE = dt.datetime.utcnow().replace(tzinfo=pytz.UTC) + dt.timedelta(
+TEST_START_DATE = dt.datetime.now(dt.UTC)
+TEST_END_DATE = dt.datetime.now().replace(tzinfo=dt.UTC) + dt.timedelta(
     days=1)
-TEST_LAST_MOD = dt.datetime.utcnow().replace(tzinfo=pytz.UTC) - dt.timedelta(
+TEST_LAST_MOD = dt.datetime.now().replace(tzinfo=dt.UTC) - dt.timedelta(
     days=1)
 
 TEST_XLSX_FILE_SMALL = [

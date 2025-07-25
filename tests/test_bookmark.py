@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 #
-# Copyright (c) 2023, Roland Rickborn (r_2@gmx.net)
+# Copyright (c) 2025, Roland Rickborn (r_2@gmx.net)
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,6 @@ import datetime as dt
 import json
 
 import pytest
-import pytz
 
 import src.ebm.bookmark as bookmark
 import tests.ebm_fixtures as fix
@@ -416,8 +415,8 @@ class TestBookmarkValidation(object):
             'not be validated'.format(fix.TITLE_GOOD)
 
     def test_end_date_in_past_bookmark(self):
-        test_start_date = dt.datetime.utcnow().replace(tzinfo=pytz.UTC)
-        test_end_date = dt.datetime.utcnow().replace(tzinfo=pytz.UTC) - \
+        test_start_date = dt.datetime.now().replace(tzinfo=dt.UTC)
+        test_end_date = dt.datetime.now().replace(tzinfo=dt.UTC) - \
             dt.timedelta(days=1)
         with pytest.raises(Exception) as e:
             bookmark.Bookmark(
@@ -431,9 +430,9 @@ class TestBookmarkValidation(object):
             '\' could not be validated'.format(fix.TITLE_GOOD)
 
     def test_end_date_before_start_date_bookmark(self):
-        test_start_date = dt.datetime.utcnow().replace(tzinfo=pytz.UTC) + \
+        test_start_date = dt.datetime.now().replace(tzinfo=dt.UTC) + \
             dt.timedelta(days=10)
-        test_end_date = dt.datetime.utcnow().replace(tzinfo=pytz.UTC) + \
+        test_end_date = dt.datetime.now().replace(tzinfo=dt.UTC) + \
             dt.timedelta(days=9)
         with pytest.raises(Exception) as e:
             bookmark.Bookmark(
@@ -447,7 +446,7 @@ class TestBookmarkValidation(object):
             '\' could not be validated'.format(fix.TITLE_GOOD)
 
     def test_outdated_end_date_bookmark(self):
-        test_end_date = dt.datetime.utcnow().replace(tzinfo=pytz.UTC) - \
+        test_end_date = dt.datetime.now().replace(tzinfo=dt.UTC) - \
             dt.timedelta(days=1)
         with pytest.raises(Exception) as e:
             bookmark.Bookmark(

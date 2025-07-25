@@ -45,6 +45,7 @@ htmlcov/
 .coverage.*
 .cache
 nosetests.xml
+test-results.xml
 coverage.xml
 *.cover
 *.py,cover
@@ -138,3 +139,4 @@ dmypy.json
 
 # Visual Studio Code
 *.code-workspace
+coverage/junit/test-results.xml

@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 #
-# Copyright (c) 2023, Roland Rickborn (r_2@gmx.net)
+# Copyright (c) 2025, Roland Rickborn (r_2@gmx.net)
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,7 @@
 # 2022-12-20  Created
 # 2022-12-29  Updated
 # 2023-02-20  Extended
+# 2025-07-24  Extended
 #
 # ---------------------------------------------------------------------------
 
@@ -43,10 +44,10 @@ except ModuleNotFoundError:
     import xls2bm
 
 __author__ = 'Roland Rickborn'
-__copyright__ = 'Copyright (c) 2023 {}'.format(__author__)
-__version__ = '2.1'
+__copyright__ = 'Copyright (c) 2025 {}'.format(__author__)
+__version__ = '2.2'
 __url__ = 'https://github.com/gitRigge/EnterpriseBookmarksManager'
-__license__ = 'MIT License (MIT)'
+__license__ = 'MIT License (MIT)' + ', ' + __copyright__
 
 
 def run_from_command_line(args):
@@ -61,6 +62,9 @@ def run_from_command_line(args):
         sys.exit(0)
     if args.status:
         utils.print_status()
+        sys.exit(0)
+    if args.license:
+        utils.print_license(__license__)
         sys.exit(0)
     if args.inputfile is None:
         candidate = utils.get_most_possible_file()
@@ -118,6 +122,9 @@ def main(argv=None):
     parser.add_argument(
         '-s', '--status', action='store_true',
         help='Show list of status and exit')
+    parser.add_argument(
+        '-l', '--license', action='store_true',
+        help='Show license information and exit')
     parser.add_argument(
         '--version', action='version',
         version='version: {}'.format(__version__))
