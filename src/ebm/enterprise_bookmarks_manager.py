@@ -104,7 +104,8 @@ def run_from_command_line(args):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(
-        description='Manage SharePoint Enterprise Bookmarks',
+        description='Generates xlsx files to work with Excel or '
+                    'csv files to import in Admin Center.',
         epilog='''For more help, see:
         https://github.com/gitRigge/EnterpriseBookmarksManager''')
     parser.add_argument(

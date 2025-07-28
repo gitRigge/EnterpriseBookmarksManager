@@ -471,11 +471,11 @@ class Bookmark(object):
     @classmethod
     def validate_start_end_dates(cls, sdate, edate):
         if isinstance(edate, datetime.date):
-            if edate < datetime.datetime.now().replace(tzinfo=datetime.UTC):
+            if edate.timestamp() < datetime.datetime.now().timestamp():
                 return False
         if isinstance(sdate, datetime.date) and isinstance(
                 edate, datetime.date):
-            if edate < sdate:
+            if edate.timestamp() < sdate.timestamp():
                 return False
         return True
 
