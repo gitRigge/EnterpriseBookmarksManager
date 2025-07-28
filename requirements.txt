@@ -9,5 +9,6 @@ pytest
 pytest-cov
 pytest-mock
 tox
+tox-gh-actions
 validators
 setuptools
