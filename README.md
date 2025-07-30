@@ -29,20 +29,43 @@ Just run the app to use the interactive mode:
 
 ```enterprise_bookmarks_manager.exe```
 
+In this mode, the app tries to detect a bookmark file in the current working directory. If it finds multiple files that fit, it suggests the latest one. In any case, it will ask you to confirm to continue.
+
 ### CLI mode
 
 Or open a command line and call the app with an argument:
 
-```enterprise_bookmarks_manager.exe Bookmarks_from_Admin_Center.csv```
+```enterprise_bookmarks_manager.exe -i Bookmarks_from_Admin_Center.csv```
 
 This will result in the Excel file 'Bookmarks_from_Admin_Center.xlsx'
 
 Or call the app like this:
 
-```enterprise_bookmarks_manager.exe Bookmarks_from_Admin_Center.xlsx```
+```enterprise_bookmarks_manager.exe -i Bookmarks_to_Admin_Center.xlsx```
 
-This will result in the CSV file 'Bookmarks_from_Admin_Center.csv' which you then can import in the Admin Center.
+This will result in the CSV file 'Bookmarks_to_Admin_Center.csv' which you then can import in the Admin Center.
 
+The app comes with a few more helpful options, see help:
+
+```enterprise_bookmarks_manager.exe -h```
+
+    
+    usage: enterprise_bookmarks_manager.exe [-h] [-i INPUTFILE] [-c] [-v] [-d] [-s] [-l] [--version]
+
+    Generates xlsx files to work with Excel or csv files to import in Admin Center.
+
+    options:
+    -h, --help            show this help message and exit
+    -i, --inputfile INPUTFILE
+                            Specify input file to read (Excel or CSV)
+    -c, --countries       Show list of ISO country codes and exit
+    -v, --variations      Show sample variations JSON and exit
+    -d, --devices         Show list of devices and exit
+    -s, --status          Show list of status and exit
+    -l, --license         Show license information and exit
+    --version             show program's version number and exit
+
+    For more help, see: https://github.com/gitRigge/EnterpriseBookmarksManager
 
 ### Development
 
