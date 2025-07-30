@@ -45,7 +45,7 @@ except ModuleNotFoundError:
 
 __author__ = 'Roland Rickborn'
 __copyright__ = 'Copyright (c) 2025 {}'.format(__author__)
-__version__ = '2.2'
+__version__ = '2.3'
 __url__ = 'https://github.com/gitRigge/EnterpriseBookmarksManager'
 __license__ = 'MIT License (MIT)' + ', ' + __copyright__
 
