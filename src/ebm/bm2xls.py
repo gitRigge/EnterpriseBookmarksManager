@@ -111,7 +111,11 @@ def get_date_format_by_str(datetimestr: str):
 
 
 def convert_csv_to_excel(filename: str):
-    my_input_data = read_input_file('{}.csv'.format(filename))
+    try:
+        my_input_data = read_input_file('{}.csv'.format(filename))
+    except ValidationError as e:
+        print(e)
+        sys.exit(1)
     wb = openpyxl.Workbook()
     wb.iso_dates = True
     ws = wb.active
