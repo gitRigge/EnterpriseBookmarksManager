@@ -90,6 +90,9 @@ def read_input_file(filename: str):
             )
             retval.add_bookmark(my_bookmark)
         return retval
+    except bookmark.ValidationError as e:
+        print(e)
+        sys.exit(1)
     except FileNotFoundError as e:
         print(e)
         sys.exit(2)
