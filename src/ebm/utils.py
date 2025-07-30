@@ -80,7 +80,7 @@ def print_countries():
 
 
 def print_variations():
-    print('Template Variation:')
+    print('Template Variations:')
     print('[{},{{...}}]'.format(enums.Enums().variations))
     print('\nThe usage of \'title\', \'url\', \'description\', ' +
           'and \'device\' is optional.')

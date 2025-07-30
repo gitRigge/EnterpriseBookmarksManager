@@ -54,7 +54,7 @@ def run_from_command_line(args):
     if args.countries:
         utils.print_countries()
         sys.exit(0)
-    if args.variation:
+    if args.variations:
         utils.print_variations()
         sys.exit(0)
     if args.devices:
@@ -115,8 +115,8 @@ def main(argv=None):
         '-c', '--countries', action='store_true',
         help='Show list of ISO country codes and exit')
     parser.add_argument(
-        '-v', '--variation', action='store_true',
-        help='Show sample variation JSON and exit')
+        '-v', '--variations', action='store_true',
+        help='Show sample variations JSON and exit')
     parser.add_argument(
         '-d', '--devices', action='store_true',
         help='Show list of devices and exit')
